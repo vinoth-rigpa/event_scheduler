@@ -1,0 +1,201 @@
+<ion-content>
+  <div class="background">
+    <div class="layer">
+      <div class="event-loading-holder" style="visibility: visible">
+        <div class="loading-holder"><div class="loader-gif"></div></div>
+      </div>
+      <div class="event-holder" style="visibility: hidden; width: 0; height: 0">
+        <div class="meeting-room-holder">
+          <div class="top-header">
+            <div class="header-logo-holder"></div>
+            <div class="title-holder">
+              <h4 class="room-title">{{roomName}}</h4>
+            </div>
+            <div class="time-menu-holder">
+              <div class="time-holder">
+                <div class="time-div">
+                  <div class="time-txt">{{todayTime}}</div>
+                  <div class="time-subtxt">{{todayTimeTxt}}</div>
+                </div>
+                <p class="date-txt">{{todayDate}}</p>
+              </div>
+              <button class="settings-menu" (click)="askAdminPassword()">
+                <ion-icon name="settings-outline" slot="icon-only"></ion-icon>
+              </button>
+            </div>
+          </div>
+          <div class="room-status"><h2>{{event_status}}</h2></div>
+          <div class="events-holder">
+            <div class="upcoming-events">
+              <div class="event-title" *ngIf="upcomingEventsList.length>0">
+                <p class="event-title-txt">{{sliderTitle}}</p>
+                <ion-button
+                  *ngIf="event_status=='PENDING'"
+                  (click)="checkinEvent()"
+                  class="checkin-btn ion-activatable ripple-parent"
+                  color="white"
+                  shape="round"
+                  fill="outline"
+                  size="small"
+                  >Check-in <ion-ripple-effect></ion-ripple-effect>
+                </ion-button>
+              </div>
+              <ion-slides
+                id="slides"
+                style="visibility: hidden; width: 0; height: 0"
+                #slides
+                class="slides"
+                pager="true"
+                (ionSlideDidChange)="slideChange($event)"
+              >
+                <ion-slide *ngFor="let data of upcomingEventsList; let i=index">
+                  <div class="event-details">
+                    <div class="event-content">
+                      <h2>{{data.event_name}}</h2>
+                      <div class="time-txt-content">
+                        <div class="timetxt">
+                          <div class="event-times">
+                            <div class="time-div">
+                              <div class="time-txt">{{data.start_time}}</div>
+                              <div class="time-subtxt">
+                                {{data.start_timetxt}}
+                              </div>
+                            </div>
+                            <div class="time-spacer">-</div>
+                            <div class="time-div">
+                              <div class="time-txt">{{data.end_time}}</div>
+                              <div class="time-subtxt">
+                                {{data.end_timetxt}}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="datetxt">
+                          <!-- {{data.start_date}} -->
+                          <div class="datetxt-head"></div>
+                          <div class="datetxt-body">{{data.start_date}}</div>
+                        </div>
+                      </div>
+                      <div class="bottom-txt-div">
+                        <div class="bottom-txt-inner">
+                          <p class="bottom-lbl">Organizer :</p>
+                          <p class="bottom-val">{{data.organizer}}</p>
+                        </div>
+                        <div class="bottom-txt-inner">|</div>
+                        <div class="bottom-txt-inner">
+                          <p class="bottom-lbl">Department :</p>
+                          <p class="bottom-val">{{data.dept_name}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ion-slide>
+              </ion-slides>
+              <div
+                id="no_events"
+                class="no_events"
+                style="visibility: hidden; width: 0; height: 0"
+              >
+                <div class="event-title">
+                  <p class="event-title-txt">UPCOMING EVENTS</p>
+                </div>
+                <div class="event-details">
+                  <div class="event-content">
+                    <h2>&nbsp;</h2>
+                    <div class="time-txt-content">
+                      <div class="timetxt"><h4>No Event</h4></div>
+                      <div class="datetxt">
+                        <!-- {{todayDateTxt}} -->
+                        <div class="datetxt-head"></div>
+                        <div class="datetxt-body">{{todayDateTxt}}</div>
+                      </div>
+                    </div>
+                    <div class="bottom-txt-div">
+                      <div class="bottom-txt-inner">
+                        <p class="bottom-lbl">&nbsp;</p>
+                        <p class="bottom-val">&nbsp;</p>
+                      </div>
+                      <div class="bottom-txt-inner">&nbsp;</div>
+                      <div class="bottom-txt-inner">
+                        <p class="bottom-lbl">&nbsp;</p>
+                        <p class="bottom-val">&nbsp;</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="next-button-holder" *ngIf="upcomingEventsList.length>1">
+              <div class="next-button-inner">
+                <div class="prev-btn">
+                  <ion-button
+                    class="forward-arrow"
+                    fill="clear"
+                    (click)="prev(slides)"
+                  >
+                    <ion-icon
+                      class="slide-prev"
+                      name="chevron-back-outline"
+                      slot="icon-only"
+                    ></ion-icon>
+                  </ion-button>
+                </div>
+                <div class="next-txt">NEXT</div>
+                <div class="next-btn">
+                  <ion-button
+                    class="next-arrow"
+                    fill="clear"
+                    (click)="next(slides)"
+                  >
+                    <ion-icon
+                      class="slide-next"
+                      name="chevron-forward-outline"
+                      slot="icon-only"
+                    ></ion-icon>
+                  </ion-button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-menu-holder">
+          <div class="menus">
+            <ul id="occupied_ul">
+              <li>
+                <button
+                  class="menu-item red_release"
+                  (click)="releaseEvent()"
+                ></button>
+              </li>
+              <li>
+                <button
+                  class="menu-item red_extend"
+                  (click)="extendEvent()"
+                ></button>
+              </li>
+              <li>
+                <button
+                  class="menu-item red_calendar"
+                  (click)="goPage('events-calendar')"
+                ></button>
+              </li>
+              <li>
+                <button
+                  class="menu-item red_add"
+                  (click)="openEventAddModal()"
+                ></button>
+              </li>
+              <li>
+                <button
+                  class="menu-item red_delete"
+                  (click)="openEventListModal()"
+                ></button>
+              </li>
+              <li><button class="menu-item grey_spotbook"></button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

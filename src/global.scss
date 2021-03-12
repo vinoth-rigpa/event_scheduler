@@ -16,7 +16,7 @@
 @import "~@ionic/angular/css/normalize.css";
 @import "~@ionic/angular/css/structure.css";
 @import "~@ionic/angular/css/typography.css";
-@import '~@ionic/angular/css/display.css';
+@import "~@ionic/angular/css/display.css";
 
 /* Optional CSS utils that can be commented out */
 @import "~@ionic/angular/css/padding.css";
@@ -24,3 +24,458 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+* {
+  // font-family: "Roboto-Regular" !important;
+  font-family: "Exo-Regular" !important;
+}
+
+.no-padding {
+  padding: 0 !important;
+}
+
+.no-margin {
+  margin: 0 !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.loading-wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.nav-decor,
+body,
+html,
+ion-app {
+  background-color: transparent !important;
+}
+
+.event-add-modal {
+  --height: 80%;
+  --border-radius: 10px;
+  --backdrop-opacity: 1 !important;
+  --background: #fff !important;
+  padding: 0 20vw;
+  ion-list {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-top: 0;
+    ion-checkbox {
+      margin: 0 10px 0 0 !important;
+    }
+    ion-item {
+      --border-color: white !important;
+      margin: 0;
+    }
+  }
+  .recu-item {
+    --border-color: white !important;
+    margin: 0;
+  }
+  .recu-lbl {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-bottom: 15px !important;
+    ion-checkbox {
+      margin: 10px !important;
+      padding: 0 !important;
+      width: 30px !important;
+      height: auto !important;
+    }
+  }
+
+  .modal-wrapper {
+    width: 75vw !important;
+  }
+}
+
+.event-view-modal {
+  --height: 80%;
+  --border-radius: 10px;
+  --backdrop-opacity: 1 !important;
+  --background: #fff !important;
+  padding: 0 5vw;
+}
+
+.event-list-modal {
+  --height: 80%;
+  --border-radius: 10px;
+  --backdrop-opacity: 1 !important;
+  --background: #fff !important;
+  width: 100%;
+  padding: 10vw;
+  .modal-wrapper {
+    width: 75vw !important;
+    height: 75vh !important;
+  }
+}
+
+.admin-pwd-alert {
+  --backdrop-opacity: 1 !important;
+  font-size: 1.6rem !important;
+  .alert-wrapper {
+    min-width: 30vw;
+  }
+  .alert-message,
+  .alert-button {
+    font-size: 1.6rem !important;
+  }
+}
+
+.custom-loader {
+  --background: transparent !important;
+  --spinner-color: #5969a3;
+  color: #5969a3;
+}
+
+.error-message {
+  color: #eb445a !important;
+  font-size: 1.2rem !important;
+  margin-left: 10px !important;
+}
+
+.admin-pwd-alert .alert-input-group,
+.admin-pwd-alert .alert-message {
+  padding: 0 16px !important;
+}
+
+ion-list.event-detail-container.md.list-md.hydrated {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.monthview-datetable td {
+  vertical-align: middle !important;
+}
+.monthview-datetable th,
+.monthview-datetable td {
+  height: 10vh;
+  line-height: 9vh !important;
+  font-size: 1.6rem !important;
+}
+.monthview-datetable td > div {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.monthview-container {
+  height: auto !important;
+}
+
+.swiper-pagination {
+  bottom: 0 !important;
+}
+
+.swiper-pagination-bullet,
+.swiper-pagination-bullet-active {
+  background: #fff !important;
+}
+
+#no_records {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+#no_records h2 {
+  font-size: 1.2rem;
+  margin: 0;
+  text-align: center;
+}
+
+#no_events {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
+}
+
+#no_events h4 {
+  margin: 0 10px;
+  text-align: center;
+}
+
+ion-buttons ion-button ion-icon,
+.back-icon-btn {
+  font-size: 2.5rem !important;
+}
+
+ion-title {
+  font-size: 2rem !important;
+}
+
+ion-buttons ion-button {
+  height: 70px !important;
+}
+
+.extend-btn-div {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.event-extend-circle {
+  width: 25vw;
+  height: 25vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#text {
+  text-align: center;
+  position: absolute;
+  border: 5px solid #1086e8;
+  width: 300px;
+  top: 150px;
+  border-radius: 20px;
+  left: 50%;
+  margin: -50px 0 0 -150px;
+  animation: border-flicker 2s linear infinite;
+}
+
+#text h1 {
+  color: #ff00e6;
+  font-family: "Raleway", sans-serif;
+  font-size: 64px;
+  letter-spacing: 10px;
+  animation: text-flicker 3s linear infinite;
+}
+
+#offset {
+  animation: letter-flicker 2s linear infinite;
+}
+
+.checkin-btn {
+  animation: text-flicker 10s linear infinite;
+}
+
+@keyframes text-flicker {
+  0% {
+    opacity: 0.1;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+
+  2% {
+    opacity: 1;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+  8% {
+    opacity: 0.1;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+  9% {
+    opacity: 1;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+  12% {
+    opacity: 0.1;
+    text-shadow: 0px 0px rgba(242, 22, 22, 1);
+  }
+  20% {
+    opacity: 1;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+  25% {
+    opacity: 0.3;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+  30% {
+    opacity: 1;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+
+  70% {
+    opacity: 0.7;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+
+  72% {
+    opacity: 0.2;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+
+  77% {
+    opacity: 0.9;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+  100% {
+    opacity: 0.9;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+}
+
+@keyframes border-flicker {
+  0% {
+    opacity: 0.1;
+    -webkit-box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+    -moz-box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+    box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+  }
+  2% {
+    opacity: 1;
+    -webkit-box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+    -moz-box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+    box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+  }
+  4% {
+    opacity: 0.1;
+    -webkit-box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+    -moz-box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+    box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+  }
+
+  8% {
+    opacity: 1;
+    -webkit-box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+    -moz-box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+    box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+  }
+  70% {
+    opacity: 0.7;
+    -webkit-box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+    -moz-box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+    box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+  }
+  100% {
+    opacity: 1;
+    -webkit-box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+    -moz-box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+    box-shadow: 0px 0px 78px 4px rgba(16, 134, 232, 0.73);
+  }
+}
+
+@keyframes letter-flicker {
+  0% {
+    opacity: 0.1;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+  2% {
+    opacity: 0.1;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+  4% {
+    opacity: 1;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+
+  19% {
+    opacity: 1;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+  21% {
+    opacity: 0.1;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+  23% {
+    opacity: 1;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+
+  80% {
+    opacity: 1;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+  83% {
+    opacity: 0.4;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+  87% {
+    opacity: 1;
+    text-shadow: 0px 0px 29px rgba(242, 22, 22, 1);
+  }
+}
+
+ion-label,
+ion-input,
+ion-datetime,
+ion-select {
+  font-size: 1.6rem !important;
+}
+
+ion-input,
+ion-datetime,
+ion-select {
+  margin: 10px 0 0 0 !important;
+  padding: 10px 0 !important;
+}
+
+.picker-button {
+  font-size: 1.6rem !important;
+}
+
+.picker-toolbar-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.picker-button {
+  font-size: 1.6rem !important;
+}
+
+.picker-opt {
+  font-size: 1.6rem !important;
+}
+
+.picker-toolbar {
+  height: 70px !important;
+  padding: 25px 0 !important;
+}
+ion-button {
+  font-size: 1.6rem !important;
+  padding: 0px !important;
+  line-height: 1.8rem !important;
+  min-height: 50px !important;
+}
+.checkin-btn {
+  --background-focused: #c97a15 !important;
+  --background-hover: #c97a15 !important;
+  --border-color: #c97a15 !important;
+  --background: #c97a15;
+  --color: #fff !important;
+  margin-left: 20px;
+  padding: 10px !important;
+  height: 10vh;
+  font-size: 1.4rem !important;
+  min-height: auto !important;
+  font-weight: bold !important;
+  .button-native {
+    border-color: #d7d8da;
+  }
+}
+
+.select-alert {
+  button {
+    font-size: 1.4rem !important;
+  }
+  .alert-title,
+  .alert-radio-label {
+    font-size: 1.6rem !important;
+  }
+  .alert-tappable {
+    height: 60px !important;
+  }
+  .alert-wrapper {
+    width: 50vw !important;
+    max-width: 35vw !important;
+    min-width: 35vw !important;
+  }
+}

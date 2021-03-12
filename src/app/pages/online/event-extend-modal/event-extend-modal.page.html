@@ -1,0 +1,73 @@
+<ion-toolbar color="primary">
+  <ion-title>Extend Event</ion-title>
+  <ion-buttons slot="end">
+    <ion-button (click)="close()">
+      <ion-icon name="close"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</ion-toolbar>
+<ion-content>
+  <div class="events-list" id="eventsList">
+    <div class="events-inner-list">
+      <div class="bottom-txt-div">
+        <div class="bottom-txt-inner" *ngIf="currentEventData">
+          <p class="bottom-val">{{currentEventData.event_name}}</p>
+        </div>
+      </div>
+      <div class="bottom-txt-div">
+        <div class="bottom-txt-inner" *ngIf="currentEventStartTime">
+          <p class="bottom-lbl">Start Time :&nbsp;</p>
+          <p class="bottom-val">{{currentEventStartTime}}</p>
+        </div>
+        <div class="bottom-txt-inner" *ngIf="currentEventEndTime">
+          &nbsp;|&nbsp;
+        </div>
+        <div class="bottom-txt-inner" *ngIf="currentEventEndTime">
+          <p class="bottom-lbl">End Time :&nbsp;</p>
+          <p class="bottom-val">{{currentEventEndTime}}</p>
+        </div>
+      </div>
+      <div class="events-circularbar">
+        <div class="event-extend-minius" (click)="minusTime()">
+          <ion-button class="minus-btn">
+            <ion-icon name="remove-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+        <div class="event-extend-circle">
+          <circle-progress
+            [percent]="percent"
+            [radius]="radius"
+            [maxPercent]="maxPercent"
+            [showSubtitle]="true"
+            [startFromZero]="true"
+            [outerStrokeWidth]="16"
+            [innerStrokeWidth]="8"
+            [outerStrokeColor]="'#263674'"
+            [innerStrokeColor]="'#9ba6c9'"
+            [showUnits]="false"
+            [subtitle]="subtitle"
+            [unitsFontSize]="20"
+            [subtitleFontSize]="20"
+            [titleFontSize]="20"
+            [animation]="true"
+            [animationDuration]="300"
+          ></circle-progress>
+        </div>
+        <div class="event-extend-plus">
+          <ion-button class="plus-btn" (click)="addTime()">
+            <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+      <div class="extend-btn-div">
+        <ion-button
+          class="extend-btn"
+          (click)="extend()"
+          [disabled]="!(percent>0)"
+        >
+          Extend
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</ion-content>

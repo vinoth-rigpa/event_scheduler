@@ -1,0 +1,94 @@
+.event-indicator {
+  background: var(--ion-color-success);
+  width: 5px;
+  height: 5px;
+  border-radius: 5px;
+  display: table-cell;
+}
+:host ::ng-deep .monthview-primary-with-event {
+  background-color: white !important;
+}
+:host ::ng-deep .monthview-selected {
+  background-color: var(--ion-color-success) !important;
+}
+.with-event {
+  background-color: var(--ion-color-primary);
+  border-radius: 0px;
+  padding: 5px;
+}
+ion-icon {
+  margin: 0 10px;
+}
+.next-arrow {
+  float: right;
+}
+.events-list {
+  position: absolute;
+  top: 0;
+  width: 0;
+  height: 0;
+  z-index: 100;
+  visibility: hidden;
+  padding: 10vw;
+  background: rgba(0, 0, 0, 0.9);
+}
+.events-inner-list {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  flex-direction: column;
+}
+.events-inner-list ion-list {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  position: relative;
+}
+.events-inner-list ion-label h5 {
+  font-size: 1.6rem;
+  margin: 10px 0;
+  line-height: 1.8rem;
+  color: #263674;
+  text-transform: uppercase;
+}
+.events-inner-list ion-label p {
+  font-size: 1.6rem;
+  margin: 10px 0;
+  line-height: 1.8rem;
+  color: #263674;
+}
+.bottom-txt-div {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+.bottom-txt-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 5px 20px 5px 0px;
+}
+.bottom-lbl {
+  font-size: 1.2rem !important;
+  margin: 0 5px 0 0 !important;
+  color: #263674;
+  text-transform: uppercase;
+}
+.bottom-val {
+  font-size: 1.6rem !important;
+  margin: 0 5px 0 0 !important;
+  color: #263674;
+  text-transform: uppercase;
+}
+.delete-icon {
+  color: red;
+  font-size: 1.6rem;
+}
+.edit-icon {
+  color: #263674;
+  font-size: 1.6rem;
+}
+.month-title {
+  font-size: 1.8rem;
+}

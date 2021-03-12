@@ -1,0 +1,70 @@
+<ion-content padding>
+  <div class="page-content">
+    <div class="logo-holder"></div>
+    <div class="content-holder">
+      <form class="form" [formGroup]="room_details_form" novalidate>
+        <p class="text-center">Enter the following details.</p>
+        <ion-item class="text-input">
+          <ion-label position="floating">Room ID</ion-label>
+          <ion-input formControlName="room_id" type="text"></ion-input>
+        </ion-item>
+        <div class="validation-errors">
+          <ng-container *ngFor="let validation of validation_messages.room_id">
+            <div
+              class="error-message"
+              *ngIf="(room_details_form.get('room_id').hasError('pattern') || room_details_form.get('room_id').hasError(validation.type)) && (room_details_form.get('room_id').dirty || room_details_form.get('room_id').touched)"
+            >
+              {{ validation.message }}
+            </div>
+          </ng-container>
+        </div>
+        <ion-item class="text-input">
+          <ion-label position="floating">Room Name</ion-label>
+          <ion-input formControlName="room_name" type="text"></ion-input>
+        </ion-item>
+        <div class="validation-errors">
+          <ng-container
+            *ngFor="let validation of validation_messages.room_name"
+          >
+            <div
+              class="error-message"
+              *ngIf="room_details_form.get('room_name').hasError(validation.type) && (room_details_form.get('room_name').dirty || room_details_form.get('room_name').touched)"
+            >
+              {{ validation.message }}
+            </div>
+          </ng-container>
+        </div>
+        <ion-item class="text-input">
+          <ion-label position="floating">Room Password</ion-label>
+          <ion-input
+            formControlName="room_password"
+            type="password"
+          ></ion-input>
+        </ion-item>
+        <div class="validation-errors">
+          <ng-container
+            *ngFor="let validation of validation_messages.room_password"
+          >
+            <div
+              class="error-message"
+              *ngIf="room_details_form.get('room_password').hasError(validation.type) && (room_details_form.get('room_password').dirty || room_details_form.get('room_password').touched)"
+            >
+              {{ validation.message }}
+            </div>
+          </ng-container>
+        </div>
+        <!-- <ion-item class="text-input">          <ion-label position="floating">Server URL</ion-label>          <ion-input            formControlName="network_url"            type="text"          ></ion-input>        </ion-item>        <div class="validation-errors">          <ng-container            *ngFor="let validation of validation_messages.network_url"          >            <div              class="error-message"              *ngIf="room_details_form.get('network_url').hasError(validation.type) && (room_details_form.get('network_url').dirty || room_details_form.get('network_url').touched)"            >              {{ validation.message }}            </div>          </ng-container>        </div> -->
+      </form>
+      <div class="submit-btn-div">
+        <ion-button
+          color="primary"
+          class="ion-activatable ripple-parent submit-btn"
+          [disabled]="!room_details_form.valid"
+          (click)="storeData()"
+        >
+          Submit <ion-ripple-effect></ion-ripple-effect>
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</ion-content>

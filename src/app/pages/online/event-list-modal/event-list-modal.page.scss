@@ -1,0 +1,63 @@
+.events-list {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+}
+.events-inner-list {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  flex-direction: column;
+}
+.events-inner-list ion-list {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  position: relative;
+}
+.events-inner-list ion-label h5 {
+  font-size: 1.6rem;
+  margin: 10px 0;
+  line-height: 1.8rem;
+  color: #263674;
+  text-transform: uppercase;
+}
+.events-inner-list ion-label p {
+  font-size: 1.6rem;
+  margin: 10px 0;
+  line-height: 1.8rem;
+  color: #263674;
+}
+.bottom-txt-div {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+.bottom-txt-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 5px 20px 5px 0px;
+}
+.bottom-lbl {
+  font-size: 1.2rem !important;
+  margin: 0 5px 0 0 !important;
+  color: #263674;
+  text-transform: uppercase;
+}
+.bottom-val {
+  font-size: 1.6rem !important;
+  margin: 0 5px 0 0 !important;
+  color: #263674;
+  text-transform: uppercase;
+}
+.delete-icon {
+  color: red;
+  font-size: 1.6rem;
+}
+.edit-icon {
+  color: #263674;
+  font-size: 1.6rem;
+}

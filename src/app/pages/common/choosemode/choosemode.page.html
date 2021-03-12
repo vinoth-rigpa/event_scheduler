@@ -1,0 +1,27 @@
+<ion-content padding>
+  <div class="page-content">
+    <div class="logo-holder"></div>
+    <div class="select-mode">
+      <div
+        class="offline-mode ion-activatable ripple-parent"
+        (click)="chooseMode('offline')"
+      >
+        <p>
+          Standalone <br />
+          (Offline)
+        </p>
+        <ion-ripple-effect></ion-ripple-effect>
+      </div>
+      <div
+        class="online-mode ion-activatable ripple-parent"
+        (click)="chooseMode('online')"
+      >
+        <p>
+          Live <br />
+          (Online)
+        </p>
+        <ion-ripple-effect></ion-ripple-effect>
+      </div>
+    </div>
+  </div>
+</ion-content>

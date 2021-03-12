@@ -1,0 +1,54 @@
+.background {
+  background: url(/assets/imgs/meetingroom.jpg);
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.layer {
+  background-color: #fff;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.room-status {
+  display: flex;
+  background-color: #fff;
+  align-items: center;
+  justify-content: center;
+  h2 {
+    font-size: 2rem;
+  }
+}
+
+.event-loading-holder {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-holder {
+  visibility: visible;
+  width: auto;
+  height: auto;
+  position: relative;
+}
+
+.loader-gif {
+  background: url(/assets/imgs/loading_ios.gif);
+  background-repeat: no-repeat;
+  background-position: center;
+  position: relative;
+  background-size: contain;
+  margin: 0 auto;
+  width: 10vw;
+  height: 10vw;
+}

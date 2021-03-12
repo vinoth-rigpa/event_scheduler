@@ -1,0 +1,59 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start" (click)="goBack()">
+      <ion-icon name="arrow-back-outline" class="back-icon-btn"></ion-icon>
+    </ion-buttons>
+    <ion-title>Edit Department</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-list lines="full">
+    <form [formGroup]="editForm">
+      <ion-item>
+        <ion-label position="floating">Department Name</ion-label>
+        <ion-input formControlName="dept_name" type="text" required></ion-input>
+      </ion-item>
+      <div class="validation-errors">
+        <ng-container *ngFor="let validation of validation_messages.dept_name">
+          <div
+            class="error-message"
+            *ngIf="editForm.get('dept_name').hasError(validation.type) && (editForm.get('dept_name').dirty || editForm.get('dept_name').touched)"
+          >
+            {{ validation.message }}
+          </div>
+        </ng-container>
+      </div>
+      <ion-item>
+        <ion-label position="floating">Department Password</ion-label>
+        <ion-input formControlName="dept_password" type="text" required>
+        </ion-input>
+      </ion-item>
+      <div class="validation-errors">
+        <ng-container
+          *ngFor="let validation of validation_messages.dept_password"
+        >
+          <div
+            class="error-message"
+            *ngIf="editForm.get('dept_password').hasError(validation.type) && (editForm.get('dept_password').dirty || editForm.get('dept_password').touched)"
+          >
+            {{ validation.message }}
+          </div>
+        </ng-container>
+      </div>
+      <ion-row>
+        <ion-col>
+          <ion-button
+            color="primary"
+            shape="full"
+            expand="block"
+            class="ion-activatable ripple-parent submit-btn"
+            [disabled]="!editForm.valid"
+            (click)="saveForm()"
+          >
+            Update <ion-ripple-effect></ion-ripple-effect>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+    </form>
+  </ion-list>
+</ion-content>

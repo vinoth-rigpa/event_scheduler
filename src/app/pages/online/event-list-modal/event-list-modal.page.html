@@ -1,0 +1,49 @@
+<ion-toolbar color="primary">
+  <ion-title>Events List</ion-title>
+  <ion-buttons slot="end">
+    <ion-button (click)="close()">
+      <ion-icon name="close"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</ion-toolbar>
+<ion-content>
+  <div class="events-list" id="eventsList">
+    <div class="events-inner-list">
+      <ion-list *ngIf="eventsList.length>0;else no_records">
+        <ion-item lines="inset" *ngFor="let data of eventsList">
+          <ion-label>
+            <h5>{{data.event_name}}</h5>
+            <p class="timerstr">
+              {{data.start_datetime}} - {{data.end_datetime}}
+            </p>
+            <div class="bottom-txt-div">
+              <div class="bottom-txt-inner">
+                <p class="bottom-lbl">Organizer :</p>
+                <p class="bottom-val">{{data.organizer}}</p>
+              </div>
+              <div class="bottom-txt-inner">|</div>
+              <div class="bottom-txt-inner">
+                <p class="bottom-lbl">Department :</p>
+                <p class="bottom-val">{{data.dept_name}}</p>
+              </div>
+            </div>
+          </ion-label>
+          <div class="item-note" item-end>
+            <!-- <ion-icon name="create-outline" style="zoom: 1.5"></ion-icon> -->
+            <ion-icon
+              class="delete-icon"
+              (click)="deleteEventByID(data)"
+              name="trash-outline"
+              style="zoom: 1.5"
+            ></ion-icon>
+          </div>
+        </ion-item>
+      </ion-list>
+      <ng-template #no_records>
+        <div id="no_records">
+          <h2><br /><br />No Events Available.<br /><br /></h2>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</ion-content>

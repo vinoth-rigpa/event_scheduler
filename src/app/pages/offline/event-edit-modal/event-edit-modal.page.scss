@@ -1,0 +1,55 @@
+:host ::ng-deep .monthview-container {
+  height: auto !important;
+}
+:host ::ng-deep .event-detail-container {
+  display: none;
+}
+.ion-valid {
+  --highlight-background: none !important;
+}
+.item-has-focus {
+  --highlight-background: none !important;
+}
+.submit-btn-div {
+  padding: 10px 0px;
+  width: 65%;
+  margin: 0 auto;
+  text-align: center;
+  color: #263674;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.item-interactive {
+  --border-width: 0;
+}
+.submit-btn {
+  font-size: 1rem;
+  color: #fff;
+}
+ion-input,
+ion-datetime {
+  border-bottom: 1px solid #ddd;
+}
+ion-item {
+  margin: 10px 0;
+}
+.dept-lbl {
+  margin-bottom: 10px !important;
+}
+.select_box ion-select {
+  border-bottom: 1px solid #ccc !important;
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  margin: 10px 0 0 0 !important;
+  min-height: 35px;
+  align-items: center;
+}
+@media screen and (max-width: 600px) {
+  .text-input,
+  .content-holder {
+    width: 100%;
+  }
+}

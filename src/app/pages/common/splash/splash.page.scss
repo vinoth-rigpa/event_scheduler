@@ -1,0 +1,53 @@
+.page-content {
+  height: 100%;
+  background: #fff !important;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.logo-holder {
+  margin: 0;
+  display: flex;
+  width: 30vw;
+  height: 20vh;
+  background-image: url(/assets/imgs/logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.content-holder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.top-div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+h4 {
+  color: #263674;
+  font-size: 1.5rem;
+  margin: 25px 0;
+  font-weight: bold !important;
+}
+
+.bootom-div {
+  padding: 10px 0px;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  color: #263674;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

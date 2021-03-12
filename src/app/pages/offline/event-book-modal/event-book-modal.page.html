@@ -1,0 +1,157 @@
+<ion-toolbar color="primary">
+  <ion-title>Book event</ion-title>
+  <ion-buttons slot="end">
+    <ion-button (click)="close()">
+      <ion-icon name="close"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</ion-toolbar>
+<ion-content>
+  <form [formGroup]="eventForm">
+    <ion-item style="visibility: hidden; width: 0; height: 0">
+      <ion-label position="stacked">Event ID</ion-label>
+      <ion-input
+        [(ngModel)]="event_id"
+        formControlName="event_id"
+        type="text"
+        required
+        readonly
+      ></ion-input>
+    </ion-item>
+    <div class="validation-errors">
+      <ng-container *ngFor="let validation of validation_messages.event_id">
+        <div
+          class="error-message"
+          *ngIf="eventForm.get('event_id').hasError(validation.type) && (eventForm.get('event_id').dirty || eventForm.get('event_id').touched)"
+        >
+          {{ validation.message }}
+        </div>
+      </ng-container>
+    </div>
+    <ion-item>
+      <ion-label position="stacked">Event Name</ion-label>
+      <ion-input formControlName="event_name" type="text" required></ion-input>
+    </ion-item>
+    <div class="validation-errors">
+      <ng-container *ngFor="let validation of validation_messages.event_name">
+        <div
+          class="error-message"
+          *ngIf="eventForm.get('event_name').hasError(validation.type) && (eventForm.get('event_name').dirty || eventForm.get('event_name').touched)"
+        >
+          {{ validation.message }}
+        </div>
+      </ng-container>
+    </div>
+    <ion-item>
+      <ion-label position="stacked">Start Time</ion-label>
+      <ion-datetime
+        [(ngModel)]="event_start_date"
+        [min]="minDate"
+        displayFormat="D MMM YYYY H:mm"
+        formControlName="start_datetime"
+        readonly
+      ></ion-datetime>
+    </ion-item>
+    <div class="validation-errors">
+      <ng-container
+        *ngFor="let validation of validation_messages.start_datetime"
+      >
+        <div
+          class="error-message"
+          *ngIf="eventForm.get('start_datetime').hasError(validation.type) && (eventForm.get('start_datetime').dirty || eventForm.get('start_datetime').touched)"
+        >
+          {{ validation.message }}
+        </div>
+      </ng-container>
+    </div>
+    <ion-item>
+      <ion-label position="stacked">End Time</ion-label>
+      <ion-datetime
+        (click)="openPopupWindow()"
+        [min]="minDate"
+        displayFormat="D MMM YYYY H:mm"
+        formControlName="end_datetime"
+        (ionChange)="checkEventTime($event)"
+      ></ion-datetime>
+    </ion-item>
+    <div class="validation-errors">
+      <ng-container *ngFor="let validation of validation_messages.end_datetime">
+        <div
+          class="error-message"
+          *ngIf="eventForm.get('end_datetime').hasError(validation.type) && (eventForm.get('end_datetime').dirty || eventForm.get('end_datetime').touched)"
+        >
+          {{ validation.message }}
+        </div>
+      </ng-container>
+    </div>
+    <ion-item>
+      <ion-label position="stacked">Organizer Name</ion-label>
+      <ion-input formControlName="organizer" type="text" required></ion-input>
+    </ion-item>
+    <div class="validation-errors">
+      <ng-container *ngFor="let validation of validation_messages.organizer">
+        <div
+          class="error-message"
+          *ngIf="eventForm.get('organizer').hasError(validation.type) && (eventForm.get('organizer').dirty || eventForm.get('organizer').touched)"
+        >
+          {{ validation.message }}
+        </div>
+      </ng-container>
+    </div>
+    <ion-item class="select_box no-padding no-margin">
+      <ion-label position="stacked" class="dept-lbl">Department Name</ion-label>
+      <ion-select
+        (click)="openPopupWindow()"
+        [class.invalid]="!eventForm.controls.dept_name.valid && (eventForm.controls.dept_name.dirty)"
+        formControlName="dept_name"
+        placeholder="Select Department"
+      >
+        <ion-select-option
+          *ngFor="let data of departmentData"
+          [value]="data.dept_name"
+          >{{data.dept_name}}</ion-select-option
+        >
+      </ion-select>
+    </ion-item>
+    <div class="validation-errors">
+      <ng-container *ngFor="let validation of validation_messages.dept_name">
+        <div
+          class="error-message"
+          *ngIf="eventForm.get('dept_name').hasError(validation.type) && (eventForm.get('dept_name').dirty || eventForm.get('dept_name').touched)"
+        >
+          {{ validation.message }}
+        </div>
+      </ng-container>
+    </div>
+    <ion-item>
+      <ion-label position="stacked">Department Password</ion-label>
+      <ion-input
+        formControlName="dept_password"
+        type="password"
+        required
+      ></ion-input>
+    </ion-item>
+    <div class="validation-errors">
+      <ng-container
+        *ngFor="let validation of validation_messages.dept_password"
+      >
+        <div
+          class="error-message"
+          *ngIf="eventForm.get('dept_password').hasError(validation.type) && (eventForm.get('dept_password').dirty || eventForm.get('dept_password').touched)"
+        >
+          {{ validation.message }}
+        </div>
+      </ng-container>
+    </div>
+  </form>
+  <div class="submit-btn-div">
+    <ion-button
+      color="primary"
+      class="ion-activatable ripple-parent submit-btn"
+      [disabled]="!eventForm.valid"
+      (click)="storeData()"
+    >
+      Submit <ion-ripple-effect></ion-ripple-effect>
+    </ion-button>
+  </div>
+</ion-content>

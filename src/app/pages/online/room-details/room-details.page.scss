@@ -1,0 +1,122 @@
+.ripple-parent {
+  position: relative;
+  overflow: hidden;
+}
+
+.page-content {
+  height: 100%;
+  background: #fff !important;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.logo-holder {
+  margin: 0;
+  display: flex;
+  width: 30vw;
+  height: 20vh;
+  background-image: url(/assets/imgs/logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.content-holder {
+  width: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.text-input {
+  margin: 10px 0 !important;
+  padding: 1.5vw;
+  background: #fff;
+  color: #263674;
+  font-size: 1.2rem;
+  width: 100%;
+}
+
+.input-cover {
+  position: relative !important;
+}
+
+.item-block {
+  height: 4rem;
+  min-height: 2.2rem;
+}
+
+.page-content .item {
+  border: 1px solid #304186;
+  padding: 0;
+  border-radius: 10px;
+}
+
+.list .item-block .item-inner {
+  border: 1px solid #ddd !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+p {
+  color: #263674;
+  font-size: 1.2rem;
+  margin: 15px;
+  font-weight: normal !important;
+}
+
+.ion-valid {
+  --highlight-background: none !important;
+}
+
+.item-has-focus {
+  --highlight-background: none !important;
+}
+
+.submit-btn-div {
+  padding: 10px 0px;
+  width: 65%;
+  margin: 0 auto;
+  text-align: center;
+  color: #263674;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  position: relative;
+}
+
+.item-interactive {
+  --border-width: 0;
+}
+
+.submit-btn {
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+form {
+  width: 40%;
+}
+
+@media screen and (max-width: 600px) {
+  .text-input,
+  .content-holder {
+    width: 100%;
+  }
+}

@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start" (click)="goBack()">
+      <ion-icon name="arrow-back-outline" class="back-icon-btn"></ion-icon>
+    </ion-buttons>
+    <ion-title>Department</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="addDepartmentPage()">
+        <ion-icon name="add-circle-outline" class="add-icon-btn"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-list *ngIf="departmentData.length>0;else no_records">
+    <ion-item lines="inset" *ngFor="let data of departmentData">
+      <ion-label>
+        <h5>{{data.dept_name}}</h5>
+        <p>{{data.dept_password}}</p>
+      </ion-label>
+      <div class="item-note" item-end>
+        <ion-icon
+          class="edit-icon"
+          name="create-outline"
+          style="zoom: 1.5"
+          [routerLink]="['/department-edit/', data.id]"
+        ></ion-icon>
+        <ion-icon
+          class="delete-icon"
+          name="trash-outline"
+          style="zoom: 1.5"
+          (click)="deleteDepartment(data.id)"
+        ></ion-icon>
+      </div>
+    </ion-item>
+  </ion-list>
+  <ng-template #no_records>
+    <div id="no_records">
+      <h2>
+        Departments not yet added.<br /><br />Use (+) icon to add department
+      </h2>
+    </div>
+  </ng-template>
+</ion-content>
