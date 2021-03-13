@@ -38,21 +38,19 @@ export class DepartmentPage implements OnInit {
           role: 'cancel',
           cssClass: 'secondary',
           handler: (blah) => {
-            console.log('Confirm Cancel: blah');
+            AppConfig.consoleLog('Confirm Cancel: blah');
           },
         },
         {
           text: 'Ok',
           handler: () => {
-            console.log('Confirm Okay');
+            AppConfig.consoleLog('Confirm Okay');
             this.db.deleteDepartment(id).then(async (res) => {
               this.db.getDepartments().then((item) => {
                 this.departmentData = item;
                 this.toast
                   .show(`Department deleted`, '2000', 'bottom')
-                  .subscribe((toast) => {
-                    console.log(toast);
-                  });
+                  .subscribe((toast) => {});
               });
             });
           },

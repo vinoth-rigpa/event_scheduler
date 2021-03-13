@@ -26,9 +26,9 @@ export class DashboardPage implements OnInit {
           'yyyy-MM-dd HH:mm',
           this.locale
         );
-        console.log('curr time', currentDateTime);
+        AppConfig.consoleLog('curr time', currentDateTime);
         this.db.getEventStatus(currentDateTime).then((res) => {
-          console.log('getEventStatus', res);
+          AppConfig.consoleLog('getEventStatus', res);
           if (res) {
             if (res['event_status'] == 0) {
               this.router.navigate([`offline/dashboard-pending`], {

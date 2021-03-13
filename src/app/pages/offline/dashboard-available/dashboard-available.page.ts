@@ -46,7 +46,7 @@ export class DashboardAvailablePage implements OnInit {
     private router: Router,
     private toast: Toast
   ) {
-    AppConfig.consoleLog('DashboardAvailablePage constructor');
+    AppConfig.consoleLog('Offline DashboardAvailablePage constructor');
     this.device_uuid = localStorage.getItem('device_uuid');
     this.device_password = localStorage.getItem('device_password');
     AppConfig.consoleLog('this.device_password', this.device_password);
@@ -57,11 +57,11 @@ export class DashboardAvailablePage implements OnInit {
   truncate = (input) =>
     input.length > 26 ? `${input.substring(0, 26)}...` : input;
   public next(slides) {
-    console.log('slides', slides);
+    AppConfig.consoleLog('slides', slides);
     this.slides.slideNext();
   }
   public prev(slides) {
-    console.log('slides', slides);
+    AppConfig.consoleLog('slides', slides);
     this.slides.slidePrev();
   }
   startTime() {
@@ -79,38 +79,38 @@ export class DashboardAvailablePage implements OnInit {
       'yyyy-MM-dd HH:mm',
       this.locale
     );
-    console.log('curr time', currentDateTime);
+    AppConfig.consoleLog('curr time', currentDateTime);
     this.db.getEventStatus(currentDateTime).then((res) => {
-      console.log('getEventStatus', res);
+      AppConfig.consoleLog('getEventStatus', res);
       if (res) {
         if (res['event_status'] == 0) {
-          console.log('start_datetime ', new Date(res.start_datetime));
+          AppConfig.consoleLog('start_datetime ', new Date(res.start_datetime));
           var newDateObj = moment(new Date(res.start_datetime))
             .add(15, 'm')
             .toDate();
-          console.log('start_datetime grace ', newDateObj);
+          AppConfig.consoleLog('start_datetime grace ', newDateObj);
           let endDateTime = formatDate(
             newDateObj,
             'yyyy-MM-dd HH:mm',
             this.locale
           );
-          console.log('endDateTime ', endDateTime);
+          AppConfig.consoleLog('endDateTime ', endDateTime);
           var eDate = new Date(endDateTime);
           var sDate = new Date(currentDateTime);
-          console.log('sDate ', sDate);
-          console.log('eDate ', eDate);
+          AppConfig.consoleLog('sDate ', sDate);
+          AppConfig.consoleLog('eDate ', eDate);
           if (sDate >= eDate) {
-            console.log('dashboard-available ');
+            AppConfig.consoleLog('dashboard-available ');
             this.db
               .releaseEventStatus(this.currentEventData?.id, currentDateTime)
               .then(async (res) => {
-                console.log('releaseEventStatus', res);
+                AppConfig.consoleLog('releaseEventStatus', res);
               });
             this.router.navigate([`offline/dashboard-available`], {
               replaceUrl: true,
             });
           } else {
-            console.log('dashboard-pending ');
+            AppConfig.consoleLog('dashboard-pending ');
             this.router.navigate([`offline/dashboard-pending`], {
               replaceUrl: true,
             });
@@ -131,7 +131,7 @@ export class DashboardAvailablePage implements OnInit {
     this.db.dbState().subscribe((res) => {
       if (res) {
         this.db.getRoomDetail(this.device_uuid).then((res) => {
-          console.log('getRoomDetail', res);
+          AppConfig.consoleLog('getRoomDetail', res);
           this.roomName = this.truncate(res['room_name']);
         });
         let currentDateTime = formatDate(
@@ -139,9 +139,9 @@ export class DashboardAvailablePage implements OnInit {
           'yyyy-MM-dd HH:mm',
           this.locale
         );
-        console.log('curr time', currentDateTime);
+        AppConfig.consoleLog('curr time', currentDateTime);
         this.db.getEventStatus(currentDateTime).then((res) => {
-          console.log('getEventStatus', res);
+          AppConfig.consoleLog('getEventStatus', res);
           if (res) {
             this.currentEventData = res;
             this.currentEventData.start_datetime = formatDate(
@@ -212,7 +212,7 @@ export class DashboardAvailablePage implements OnInit {
               this.locale
             );
           }
-          console.log('upcomingEventsList', this.upcomingEventsList);
+          AppConfig.consoleLog('upcomingEventsList', this.upcomingEventsList);
           if (this.event_status == 'AVAILABLE') {
             this.sliderTitle = 'UPCOMING EVENTS';
           } else if (this.event_status == 'PENDING') {
@@ -264,7 +264,7 @@ export class DashboardAvailablePage implements OnInit {
     });
   }
   slideChange(event) {
-    console.log('event slide', event);
+    AppConfig.consoleLog('event slide', event);
     let slide_prev = document.getElementsByClassName('slide-prev');
     for (let i = 0; i < slide_prev.length; ++i) {
       let item = slide_prev[i];
@@ -276,7 +276,7 @@ export class DashboardAvailablePage implements OnInit {
       item.setAttribute('style', 'color:#FFF;');
     }
     event.target.isEnd().then((isEnd) => {
-      console.log('End of slide', isEnd);
+      AppConfig.consoleLog('End of slide', isEnd);
       if (isEnd) {
         let slide_prev = document.getElementsByClassName('slide-prev');
         for (let i = 0; i < slide_prev.length; ++i) {
@@ -291,7 +291,7 @@ export class DashboardAvailablePage implements OnInit {
       }
     });
     event.target.isBeginning().then((istrue) => {
-      console.log('End of slide', istrue);
+      AppConfig.consoleLog('End of slide', istrue);
       if (istrue) {
         let slide_prev = document.getElementsByClassName('slide-prev');
         for (let i = 0; i < slide_prev.length; ++i) {
@@ -407,7 +407,7 @@ export class DashboardAvailablePage implements OnInit {
         'yyyy-MM-dd HH:mm',
         this.locale
       );
-      console.log('curr time', currentDateTime);
+      AppConfig.consoleLog('curr time', currentDateTime);
       this.uiChanges(currentDateTime);
     }, 300);
     this.intervalRefreshData = setInterval(() => {
@@ -416,7 +416,7 @@ export class DashboardAvailablePage implements OnInit {
     }, 5000);
   }
   ionViewWillLeave() {
-    console.log('leave view -> clearInterval');
+    AppConfig.consoleLog('leave view -> clearInterval');
     clearInterval(this.intervalTimer);
     clearInterval(this.intervalRefreshData);
   }
@@ -433,17 +433,19 @@ export class DashboardAvailablePage implements OnInit {
           role: 'cancel',
           cssClass: 'secondary',
           handler: () => {
-            console.log('Confirm Cancel');
+            AppConfig.consoleLog('Confirm Cancel');
           },
         },
         {
           text: 'Ok',
           handler: async (data: any) => {
-            console.log(
+            AppConfig.consoleLog(
               'Saved Information',
-              data.password,
-              this.currentEventData?.dept_name,
-              this.device_password
+              data.password +
+                ' ' +
+                this.currentEventData?.dept_name +
+                ' ' +
+                this.device_password
             );
             let loader = this.loadingCtrl.create({
               cssClass: 'custom-loader',
@@ -458,7 +460,7 @@ export class DashboardAvailablePage implements OnInit {
               .then(async (res) => {
                 (await loader).dismiss();
                 if (res) {
-                  console.log('dept_password ', res.dept_password);
+                  AppConfig.consoleLog('dept_password ', res.dept_password);
                   let loader = this.loadingCtrl.create({
                     cssClass: 'custom-loader',
                     spinner: 'lines-small',
@@ -467,7 +469,7 @@ export class DashboardAvailablePage implements OnInit {
                   this.db
                     .updateEventStatus(this.currentEventData?.id)
                     .then(async (res) => {
-                      console.log('updateEventStatus', res);
+                      AppConfig.consoleLog('updateEventStatus', res);
                       (await loader).dismiss();
                       this.refreshData();
                     });
@@ -481,16 +483,14 @@ export class DashboardAvailablePage implements OnInit {
                     this.db
                       .updateEventStatus(this.currentEventData?.id)
                       .then(async (res) => {
-                        console.log('updateEventStatus', res);
+                        AppConfig.consoleLog('updateEventStatus', res);
                         (await loader).dismiss();
                         this.refreshData();
                       });
                   } else {
                     this.toast
                       .show(`Invalid password`, '2000', 'bottom')
-                      .subscribe((toast) => {
-                        console.log(toast);
-                      });
+                      .subscribe((toast) => {});
                   }
                 }
               });
@@ -518,17 +518,19 @@ export class DashboardAvailablePage implements OnInit {
             role: 'cancel',
             cssClass: 'secondary',
             handler: () => {
-              console.log('Confirm Cancel');
+              AppConfig.consoleLog('Confirm Cancel');
             },
           },
           {
             text: 'Ok',
             handler: async (data: any) => {
-              console.log(
+              AppConfig.consoleLog(
                 'Saved Information',
-                data.password,
-                this.currentEventData?.dept_name,
-                this.device_password
+                data.password +
+                  ' ' +
+                  this.currentEventData?.dept_name +
+                  ' ' +
+                  this.device_password
               );
               let loader = this.loadingCtrl.create({
                 cssClass: 'custom-loader',
@@ -543,7 +545,7 @@ export class DashboardAvailablePage implements OnInit {
                 .then(async (res) => {
                   (await loader).dismiss();
                   if (res) {
-                    console.log('dept_password ', res.dept_password);
+                    AppConfig.consoleLog('dept_password ', res.dept_password);
                     let currentDateTime = formatDate(
                       new Date(),
                       'yyyy-MM-dd HH:mm',
@@ -555,12 +557,10 @@ export class DashboardAvailablePage implements OnInit {
                         currentDateTime
                       )
                       .then((res) => {
-                        console.log('releaseEventStatus', res);
+                        AppConfig.consoleLog('releaseEventStatus', res);
                         this.toast
                           .show(`Event released`, '2000', 'bottom')
-                          .subscribe((toast) => {
-                            console.log(toast);
-                          });
+                          .subscribe((toast) => {});
                         this.refreshData();
                       });
                   } else {
@@ -576,20 +576,16 @@ export class DashboardAvailablePage implements OnInit {
                           currentDateTime
                         )
                         .then((res) => {
-                          console.log('updateEventStatus', res);
+                          AppConfig.consoleLog('updateEventStatus', res);
                           this.toast
                             .show(`Event released`, '2000', 'bottom')
-                            .subscribe((toast) => {
-                              console.log(toast);
-                            });
+                            .subscribe((toast) => {});
                           this.refreshData();
                         });
                     } else {
                       this.toast
                         .show(`Invalid password`, '2000', 'bottom')
-                        .subscribe((toast) => {
-                          console.log(toast);
-                        });
+                        .subscribe((toast) => {});
                     }
                   }
                 });
@@ -602,7 +598,7 @@ export class DashboardAvailablePage implements OnInit {
   }
   async extendEvent() {
     if (this.event_status == 'OCCUPIED') {
-      console.log('extend');
+      AppConfig.consoleLog('extend');
       const alert = await this.alertController.create({
         cssClass: 'admin-pwd-alert',
         message: 'Are you sure you want to extend?',
@@ -619,17 +615,19 @@ export class DashboardAvailablePage implements OnInit {
             role: 'cancel',
             cssClass: 'secondary',
             handler: () => {
-              console.log('Confirm Cancel');
+              AppConfig.consoleLog('Confirm Cancel');
             },
           },
           {
             text: 'Ok',
             handler: async (data: any) => {
-              console.log(
+              AppConfig.consoleLog(
                 'Saved Information',
-                data.password,
-                this.currentEventData?.dept_name,
-                this.device_password
+                data.password +
+                  ' ' +
+                  this.currentEventData?.dept_name +
+                  ' ' +
+                  this.device_password
               );
               let loader = this.loadingCtrl.create({
                 cssClass: 'custom-loader',
@@ -644,7 +642,7 @@ export class DashboardAvailablePage implements OnInit {
                 .then(async (res) => {
                   (await loader).dismiss();
                   if (res) {
-                    console.log('dept_password ', res.dept_password);
+                    AppConfig.consoleLog('dept_password ', res.dept_password);
                     const modal = await this.modalCtrl.create({
                       component: EventExtendModalPage,
                       componentProps: { paramID: this.currentEventData?.id },
@@ -653,7 +651,7 @@ export class DashboardAvailablePage implements OnInit {
                     });
                     await modal.present();
                     modal.onDidDismiss().then((result) => {
-                      console.log('extend res', result);
+                      AppConfig.consoleLog('extend res', result);
                       this.router.navigate([`offline/dashboard`], {
                         replaceUrl: true,
                       });
@@ -668,7 +666,7 @@ export class DashboardAvailablePage implements OnInit {
                       });
                       await modal.present();
                       modal.onDidDismiss().then((result) => {
-                        console.log('extend res', result);
+                        AppConfig.consoleLog('extend res', result);
                         this.router.navigate([`offline/dashboard`], {
                           replaceUrl: true,
                         });
@@ -676,9 +674,7 @@ export class DashboardAvailablePage implements OnInit {
                     } else {
                       this.toast
                         .show(`Invalid password`, '2000', 'bottom')
-                        .subscribe((toast) => {
-                          console.log(toast);
-                        });
+                        .subscribe((toast) => {});
                     }
                   }
                 });
@@ -691,7 +687,7 @@ export class DashboardAvailablePage implements OnInit {
   }
   async spotBooking() {
     if (this.event_status == 'AVAILABLE') {
-      console.log('spotBooking');
+      AppConfig.consoleLog('spotBooking');
       this.db.getDepartments().then(async (item) => {
         if (item.length > 0) {
           const modal = await this.modalCtrl.create({
@@ -723,9 +719,7 @@ export class DashboardAvailablePage implements OnInit {
         } else {
           this.toast
             .show(`Departments not yet added`, '2000', 'bottom')
-            .subscribe((toast) => {
-              console.log(toast);
-            });
+            .subscribe((toast) => {});
         }
       });
     }
@@ -757,10 +751,10 @@ export class DashboardAvailablePage implements OnInit {
                 this.locale
               );
               this.db.addEvent(event).then((res) => {
-                console.log('event add ', res);
+                AppConfig.consoleLog('event add ', res);
               });
               if (index === array.length - 1) {
-                console.log('event last one');
+                AppConfig.consoleLog('event last one');
                 this.router.navigate([`offline/dashboard`], {
                   replaceUrl: true,
                 });
@@ -771,9 +765,7 @@ export class DashboardAvailablePage implements OnInit {
       } else {
         this.toast
           .show(`Departments not yet added`, '2000', 'bottom')
-          .subscribe((toast) => {
-            console.log(toast);
-          });
+          .subscribe((toast) => {});
       }
     });
   }
@@ -794,9 +786,7 @@ export class DashboardAvailablePage implements OnInit {
       } else {
         this.toast
           .show(`Departments not yet added`, '2000', 'bottom')
-          .subscribe((toast) => {
-            console.log(toast);
-          });
+          .subscribe((toast) => {});
       }
     });
   }
@@ -811,25 +801,25 @@ export class DashboardAvailablePage implements OnInit {
           role: 'cancel',
           cssClass: 'secondary',
           handler: () => {
-            console.log('Confirm Cancel');
+            AppConfig.consoleLog('Confirm Cancel');
           },
         },
         {
           text: 'Ok',
           handler: (data: any) => {
-            console.log(
-              'Saved Information',
-              data.password,
-              this.device_password
+            AppConfig.consoleLog(
+              'Saved Information' +
+                ' ' +
+                data.password +
+                ' ' +
+                this.device_password
             );
             if (data.password == this.device_password) {
               this.goPage('settings');
             } else {
               this.toast
                 .show(`Invalid password`, '2000', 'bottom')
-                .subscribe((toast) => {
-                  console.log(toast);
-                });
+                .subscribe((toast) => {});
             }
           },
         },

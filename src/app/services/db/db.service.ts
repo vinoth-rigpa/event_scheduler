@@ -7,7 +7,8 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite/ngx';
-import { Event } from 'src/app/models/event';
+import { Event } from '../../models/event';
+import { AppConfig } from '../../config/appconfig';
 
 @Injectable({
   providedIn: 'root',
@@ -30,7 +31,7 @@ export class DbService {
         })
         .then((db: SQLiteObject) => {
           this.storage = db;
-          console.log('db => ', this.storage);
+          AppConfig.consoleLog('db => ', this.storage);
           this.httpClient
             .get('assets/db/dump.sql', { responseType: 'text' })
             .subscribe((data) => {
@@ -79,7 +80,7 @@ export class DbService {
         data
       )
       .then((res) => {
-        console.log('res', res);
+        AppConfig.consoleLog('res', res);
       });
   }
 
@@ -124,7 +125,7 @@ export class DbService {
         data
       )
       .then((res) => {
-        console.log('res', res);
+        AppConfig.consoleLog('res', res);
       });
   }
 
@@ -133,7 +134,7 @@ export class DbService {
     return this.storage
       .executeSql('DELETE FROM departments WHERE id = ?', [id])
       .then((res) => {
-        console.log('res', res);
+        AppConfig.consoleLog('res', res);
       });
   }
 
@@ -157,7 +158,7 @@ export class DbService {
           }
         },
         (err) => {
-          console.log('error', err);
+          AppConfig.consoleLog('error', err);
           return null;
         }
       );
@@ -167,7 +168,7 @@ export class DbService {
     return this.storage
       .executeSql(`UPDATE device_config SET room_password = ?`, [new_password])
       .then((res) => {
-        console.log('res', res);
+        AppConfig.consoleLog('res', res);
       });
   }
 
@@ -175,7 +176,7 @@ export class DbService {
     return this.storage
       .executeSql(`UPDATE device_config SET room_name = ?`, [name])
       .then((res) => {
-        console.log('res', res);
+        AppConfig.consoleLog('res', res);
       });
   }
 
@@ -188,7 +189,7 @@ export class DbService {
         data
       )
       .then((res) => {
-        console.log('Room details added', res);
+        AppConfig.consoleLog('Room details added', res);
       });
   }
 
@@ -224,7 +225,7 @@ export class DbService {
           }
         },
         (err) => {
-          console.log('error', err);
+          AppConfig.consoleLog('error', err);
           return null;
         }
       );
@@ -330,7 +331,7 @@ export class DbService {
         data
       )
       .then((res) => {
-        console.log('res', res);
+        AppConfig.consoleLog('res', res);
       });
   }
 
@@ -351,13 +352,13 @@ export class DbService {
         data
       )
       .then((res) => {
-        console.log('res', res);
+        AppConfig.consoleLog('res', res);
       });
   }
 
   // Get single object
   getEvent(id): Promise<Event> {
-    console.log('getEvent', id);
+    AppConfig.consoleLog('getEvent', id);
     return this.storage
       .executeSql('SELECT * FROM events WHERE id = ?', [id])
       .then((res) => {
@@ -393,7 +394,7 @@ export class DbService {
         data
       )
       .then((res) => {
-        console.log('res', res);
+        AppConfig.consoleLog('res', res);
       });
   }
 
@@ -402,7 +403,7 @@ export class DbService {
     return this.storage
       .executeSql('DELETE FROM events WHERE id = ?', [id])
       .then((res) => {
-        console.log('res', res);
+        AppConfig.consoleLog('res', res);
       });
   }
 
@@ -410,7 +411,7 @@ export class DbService {
     return this.storage
       .executeSql('SELECT * FROM events ORDER BY id DESC LIMIT 1', [])
       .then((res) => {
-        console.log('res', res.rows.item(0));
+        AppConfig.consoleLog('res', res.rows.item(0));
         if (res.rows.length > 0) {
           return {
             id: res.rows.item(0).id,
@@ -432,7 +433,7 @@ export class DbService {
     return this.storage
       .executeSql(`UPDATE events SET event_status = 1 WHERE id = ${id}`, [])
       .then((res) => {
-        console.log('res', res);
+        AppConfig.consoleLog('res', res);
       });
   }
 
@@ -443,7 +444,7 @@ export class DbService {
         [pmEndDate]
       )
       .then((res) => {
-        console.log('res', res);
+        AppConfig.consoleLog('res', res);
       });
   }
 
@@ -454,12 +455,12 @@ export class DbService {
         [pmEndDate]
       )
       .then((res) => {
-        console.log('res', res);
+        AppConfig.consoleLog('res', res);
       });
   }
 
   checkEventExists(pmStartDatetime, pmEndDatetime): Promise<Event> {
-    console.log('strftime ', pmStartDatetime, pmEndDatetime);
+    AppConfig.consoleLog('strftime ', pmStartDatetime + ' ' + pmEndDatetime);
     return this.storage
       .executeSql(
         "SELECT * FROM events WHERE event_status != 2 AND (((strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime)) OR (strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime)) OR (strftime('%s', start_datetime) BETWEEN strftime('%s', ?) AND  strftime('%s', ?)) OR (strftime('%s', end_datetime) BETWEEN strftime('%s', ?) AND  strftime('%s', ?))))",
@@ -473,7 +474,7 @@ export class DbService {
         ]
       )
       .then((res) => {
-        console.log('res', res.rows.item(0));
+        AppConfig.consoleLog('res', res.rows.item(0));
         if (res.rows.length > 0) {
           return {
             id: res.rows.item(0).id,
@@ -496,7 +497,10 @@ export class DbService {
     pmStartDatetime,
     pmEndDatetime
   ): Promise<Event> {
-    console.log('strftime ', eventId, pmStartDatetime, pmEndDatetime);
+    AppConfig.consoleLog(
+      'strftime ',
+      eventId + ' ' + pmStartDatetime + ' ' + pmEndDatetime
+    );
     return this.storage
       .executeSql(
         "SELECT * FROM events WHERE event_id != ? AND event_status != 2 AND (((strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime)) OR (strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime)) OR (strftime('%s', start_datetime) BETWEEN strftime('%s', ?) AND  strftime('%s', ?)) OR (strftime('%s', end_datetime) BETWEEN strftime('%s', ?) AND  strftime('%s', ?))))",
@@ -511,7 +515,7 @@ export class DbService {
         ]
       )
       .then((res) => {
-        console.log('res', res.rows.item(0));
+        AppConfig.consoleLog('res', res.rows.item(0));
         if (res.rows.length > 0) {
           return {
             id: res.rows.item(0).id,
@@ -530,14 +534,14 @@ export class DbService {
   }
 
   getEventStatus(pmDatetime): Promise<Event> {
-    console.log('strftime', pmDatetime);
+    AppConfig.consoleLog('strftime', pmDatetime);
     return this.storage
       .executeSql(
         "SELECT * FROM events WHERE event_status != 2 AND (strftime('%s', ?) = strftime('%s', start_datetime) OR strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime))",
         [pmDatetime, pmDatetime]
       )
       .then((res) => {
-        console.log('res', res.rows.item(0));
+        AppConfig.consoleLog('res', res.rows.item(0));
         if (res.rows.length > 0) {
           return {
             id: res.rows.item(0).id,

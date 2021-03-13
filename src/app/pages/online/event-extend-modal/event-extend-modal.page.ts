@@ -45,13 +45,13 @@ export class EventExtendModalPage implements AfterViewInit {
   ngAfterViewInit() {
     setTimeout(() => {
       this.modalReady = true;
-      console.log('event_id', this.navParams.data.paramID);
+      AppConfig.consoleLog('event_id', this.navParams.data.paramID);
       this.id = this.navParams.data.paramID;
-      console.log('event_id 1 ', this.id);
+      AppConfig.consoleLog('event_id 1 ', this.id);
       this.db.dbState().subscribe((res) => {
         if (res) {
           this.db.getEvent(this.id).then((res) => {
-            console.log('getEvent', res);
+            AppConfig.consoleLog('getEvent', res);
             if (res) {
               this.currentEventData = res;
               this.currentEventStartTime = formatDate(
@@ -72,10 +72,10 @@ export class EventExtendModalPage implements AfterViewInit {
             this.locale
           );
           this.subtitle = 'Minitues';
-          console.log('currentDateTime', currentDateTime);
+          AppConfig.consoleLog('currentDateTime', currentDateTime);
           this.db.getNextEvent(currentDateTime).then((item) => {
             if (item) {
-              console.log(item);
+              AppConfig.consoleLog('item', item);
               this.nextEventData = item;
             }
           });
@@ -85,12 +85,12 @@ export class EventExtendModalPage implements AfterViewInit {
   }
   ngOnInit() {}
   async extend() {
-    console.log('this.currentEventData', this.currentEventData);
-    console.log('this.nextEventData', this.nextEventData);
-    console.log('this.percent', this.percent);
+    AppConfig.consoleLog('this.currentEventData', this.currentEventData);
+    AppConfig.consoleLog('this.nextEventData', this.nextEventData);
+    AppConfig.consoleLog('this.percent', this.percent);
     if (this.percent > 0 && this.currentEventData) {
       if (this.nextEventData) {
-        console.log(
+        AppConfig.consoleLog(
           'this.currentEventData.end_datetime ',
           new Date(this.currentEventData.end_datetime)
         );
@@ -99,24 +99,24 @@ export class EventExtendModalPage implements AfterViewInit {
           'yyyy-MM-dd HH:mm',
           this.locale
         );
-        console.log('currEndDateTime ', currEndDateTime);
+        AppConfig.consoleLog('currEndDateTime ', currEndDateTime);
         var newDateObj = moment(new Date(currEndDateTime))
           .add(this.percent, 'm')
           .toDate();
-        console.log('start_datetime extend ', newDateObj);
+        AppConfig.consoleLog('start_datetime extend ', newDateObj);
         let endDateTime = formatDate(
           newDateObj,
           'yyyy-MM-dd HH:mm',
           this.locale
         );
-        console.log('endDateTime ', endDateTime);
+        AppConfig.consoleLog('endDateTime ', endDateTime);
         this.currentEventEndTime = formatDate(
           endDateTime,
           'MMM d, h:mm a',
           this.locale
         );
         var eDate = new Date(endDateTime);
-        console.log(
+        AppConfig.consoleLog(
           'this.nextEventData.start_datetime ',
           new Date(this.nextEventData.start_datetime)
         );
@@ -125,30 +125,26 @@ export class EventExtendModalPage implements AfterViewInit {
           'yyyy-MM-dd HH:mm',
           this.locale
         );
-        console.log('nxtStartDateTime ', nxtStartDateTime);
+        AppConfig.consoleLog('nxtStartDateTime ', nxtStartDateTime);
         var sDate = new Date(nxtStartDateTime);
-        console.log('sDate ', sDate);
-        console.log('eDate ', eDate);
+        AppConfig.consoleLog('sDate ', sDate);
+        AppConfig.consoleLog('eDate ', eDate);
         if (eDate >= sDate) {
           this.toast
             .show(`Can't extend beyond next event start time`, '2000', 'bottom')
-            .subscribe((toast) => {
-              console.log(toast);
-            });
+            .subscribe((toast) => {});
         } else {
           this.db
             .extendEventStatus(this.currentEventData?.id, endDateTime)
             .then((res) => {
-              console.log('extendEventStatus', res);
+              AppConfig.consoleLog('extendEventStatus', res);
               this.toast
                 .show(
                   `Event extended for another ` + this.percent + ` minitues`,
                   '3000',
                   'bottom'
                 )
-                .subscribe((toast) => {
-                  console.log(toast);
-                });
+                .subscribe((toast) => {});
               this.modalCtrl.dismiss({ event: res });
             });
         }
@@ -158,17 +154,17 @@ export class EventExtendModalPage implements AfterViewInit {
           'yyyy-MM-dd HH:mm',
           this.locale
         );
-        console.log('currEndDateTime ', currEndDateTime);
+        AppConfig.consoleLog('currEndDateTime ', currEndDateTime);
         var newDateObj = moment(new Date(currEndDateTime))
           .add(this.percent, 'm')
           .toDate();
-        console.log('start_datetime extend ', newDateObj);
+        AppConfig.consoleLog('start_datetime extend ', newDateObj);
         let endDateTime = formatDate(
           newDateObj,
           'yyyy-MM-dd HH:mm',
           this.locale
         );
-        console.log('endDateTime ', endDateTime);
+        AppConfig.consoleLog('endDateTime ', endDateTime);
         this.currentEventEndTime = formatDate(
           endDateTime,
           'MMM d, h:mm a',
@@ -177,16 +173,14 @@ export class EventExtendModalPage implements AfterViewInit {
         this.db
           .extendEventStatus(this.currentEventData?.id, endDateTime)
           .then((res) => {
-            console.log('extendEventStatus', res);
+            AppConfig.consoleLog('extendEventStatus', res);
             this.toast
               .show(
                 `Event extended for another ` + this.percent + ` minitues`,
                 '3000',
                 'bottom'
               )
-              .subscribe((toast) => {
-                console.log(toast);
-              });
+              .subscribe((toast) => {});
             this.modalCtrl.dismiss({ event: res });
           });
       }
@@ -200,13 +194,13 @@ export class EventExtendModalPage implements AfterViewInit {
         'yyyy-MM-dd HH:mm',
         this.locale
       );
-      console.log('currEndDateTime ', currEndDateTime);
+      AppConfig.consoleLog('currEndDateTime ', currEndDateTime);
       var newDateObj = moment(new Date(currEndDateTime))
         .add(this.percent, 'm')
         .toDate();
-      console.log('start_datetime extend ', newDateObj);
+      AppConfig.consoleLog('start_datetime extend ', newDateObj);
       let endDateTime = formatDate(newDateObj, 'yyyy-MM-dd HH:mm', this.locale);
-      console.log('endDateTime ', endDateTime);
+      AppConfig.consoleLog('endDateTime ', endDateTime);
       this.currentEventEndTime = formatDate(
         endDateTime,
         'MMM d, h:mm a',
@@ -222,13 +216,13 @@ export class EventExtendModalPage implements AfterViewInit {
         'yyyy-MM-dd HH:mm',
         this.locale
       );
-      console.log('currEndDateTime ', currEndDateTime);
+      AppConfig.consoleLog('currEndDateTime ', currEndDateTime);
       var newDateObj = moment(new Date(currEndDateTime))
         .add(this.percent, 'm')
         .toDate();
-      console.log('start_datetime extend ', newDateObj);
+      AppConfig.consoleLog('start_datetime extend ', newDateObj);
       let endDateTime = formatDate(newDateObj, 'yyyy-MM-dd HH:mm', this.locale);
-      console.log('endDateTime ', endDateTime);
+      AppConfig.consoleLog('endDateTime ', endDateTime);
       this.currentEventEndTime = formatDate(
         endDateTime,
         'MMM d, h:mm a',

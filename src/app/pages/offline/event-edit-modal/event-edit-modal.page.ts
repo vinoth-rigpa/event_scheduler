@@ -59,7 +59,7 @@ export class EventEditModalPage implements AfterViewInit {
         if (res) {
           this.db.getDepartments().then((item) => {
             this.departmentData = item;
-            console.log(this.departmentData);
+            AppConfig.consoleLog('departmentData', this.departmentData);
             this.db.getEvent(this.id).then((res) => {
               this.eventForm.setValue({
                 event_id: res['event_id'],
@@ -78,25 +78,23 @@ export class EventEditModalPage implements AfterViewInit {
   }
   checkEventTime($event) {
     localStorage.setItem('popup_open', 'no');
-    console.log('event val ', $event.detail.value);
+    AppConfig.consoleLog('event val ', $event.detail.value);
     if (
       this.eventForm.value.start_datetime &&
       this.eventForm.value.end_datetime
     ) {
       var eDate = new Date(this.eventForm.value.end_datetime);
       var sDate = new Date(this.eventForm.value.start_datetime);
-      console.log('sDate ', sDate);
-      console.log('eDate ', eDate);
+      AppConfig.consoleLog('sDate ', sDate);
+      AppConfig.consoleLog('eDate ', eDate);
       let startDateTime = formatDate(sDate, 'yyyy-MM-dd HH:mm', this.locale);
-      console.log('startDateTime ', startDateTime);
+      AppConfig.consoleLog('startDateTime ', startDateTime);
       let endDateTime = formatDate(eDate, 'yyyy-MM-dd HH:mm', this.locale);
-      console.log('endDateTime ', endDateTime);
+      AppConfig.consoleLog('endDateTime ', endDateTime);
       if (sDate > eDate || startDateTime == endDateTime) {
         this.toast
           .show(`End time must be greater than Start time.`, '3000', 'bottom')
-          .subscribe((toast) => {
-            console.log(toast);
-          });
+          .subscribe((toast) => {});
       } else {
         this.db
           .checkEventExistsonEdit(
@@ -105,7 +103,7 @@ export class EventEditModalPage implements AfterViewInit {
             endDateTime
           )
           .then(async (res) => {
-            console.log('endDateTime', res);
+            AppConfig.consoleLog('endDateTime', res);
             if (res) {
               this.toast
                 .show(
@@ -113,9 +111,7 @@ export class EventEditModalPage implements AfterViewInit {
                   '3000',
                   'bottom'
                 )
-                .subscribe((toast) => {
-                  console.log(toast);
-                });
+                .subscribe((toast) => {});
             }
           });
       }
@@ -133,21 +129,19 @@ export class EventEditModalPage implements AfterViewInit {
     });
   }
   async storeData() {
-    console.log(this.eventForm.value);
+    AppConfig.consoleLog(this.eventForm.value);
     var eDate = new Date(this.eventForm.value.end_datetime);
     var sDate = new Date(this.eventForm.value.start_datetime);
-    console.log('sDate ', sDate);
-    console.log('eDate ', eDate);
+    AppConfig.consoleLog('sDate ', sDate);
+    AppConfig.consoleLog('eDate ', eDate);
     let startDateTime = formatDate(sDate, 'yyyy-MM-dd HH:mm', this.locale);
-    console.log('startDateTime ', startDateTime);
+    AppConfig.consoleLog('startDateTime ', startDateTime);
     let endDateTime = formatDate(eDate, 'yyyy-MM-dd HH:mm', this.locale);
-    console.log('endDateTime ', endDateTime);
+    AppConfig.consoleLog('endDateTime ', endDateTime);
     if (sDate > eDate || startDateTime == endDateTime) {
       this.toast
         .show(`End time must be greater than Start time.`, '3000', 'bottom')
-        .subscribe((toast) => {
-          console.log(toast);
-        });
+        .subscribe((toast) => {});
     } else {
       this.db
         .checkEventExistsonEdit(
@@ -156,13 +150,11 @@ export class EventEditModalPage implements AfterViewInit {
           endDateTime
         )
         .then(async (res) => {
-          console.log('endDateTime', res);
+          AppConfig.consoleLog('endDateTime', res);
           if (res) {
             this.toast
               .show(`Event already booked in this time slot.`, '3000', 'bottom')
-              .subscribe((toast) => {
-                console.log(toast);
-              });
+              .subscribe((toast) => {});
           } else {
             let loader = this.loadingCtrl.create({
               cssClass: 'custom-loader',
@@ -177,7 +169,7 @@ export class EventEditModalPage implements AfterViewInit {
               .then(async (res) => {
                 (await loader).dismiss();
                 if (res) {
-                  console.log('dept_password ', res.dept_password);
+                  AppConfig.consoleLog('dept_password ', res.dept_password);
                   localStorage.setItem('popup_open', 'no');
                   this.modalCtrl.dismiss({
                     event_id: this.id,
@@ -195,9 +187,7 @@ export class EventEditModalPage implements AfterViewInit {
                   } else {
                     this.toast
                       .show(`Invalid password`, '2000', 'bottom')
-                      .subscribe((toast) => {
-                        console.log(toast);
-                      });
+                      .subscribe((toast) => {});
                   }
                 }
               });

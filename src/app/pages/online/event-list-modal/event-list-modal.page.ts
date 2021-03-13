@@ -57,7 +57,7 @@ export class EventListModalPage implements AfterViewInit {
                 this.locale
               );
             }
-            console.log('eventsList', this.eventsList);
+            AppConfig.consoleLog('eventsList', this.eventsList);
           });
         }
       });
@@ -78,17 +78,15 @@ export class EventListModalPage implements AfterViewInit {
           role: 'cancel',
           cssClass: 'secondary',
           handler: () => {
-            console.log('Confirm Cancel');
+            AppConfig.consoleLog('Confirm Cancel');
           },
         },
         {
           text: 'Ok',
           handler: async (data: any) => {
-            console.log(
+            AppConfig.consoleLog(
               'Saved Information',
-              data.password,
-              event.dept_name,
-              this.device_password
+              data.password + ' ' + event.dept_name + ' ' + this.device_password
             );
             let loader = this.loadingCtrl.create({
               cssClass: 'custom-loader',
@@ -100,7 +98,7 @@ export class EventListModalPage implements AfterViewInit {
               .then(async (res) => {
                 (await loader).dismiss();
                 if (res) {
-                  console.log('dept_password ', res.dept_password);
+                  AppConfig.consoleLog('dept_password ', res.dept_password);
                   this.db.deleteEvent(event.id).then(async (res) => {
                     this.eventsList = this.eventsList.filter(
                       (item) => item.id !== event.id
@@ -108,9 +106,7 @@ export class EventListModalPage implements AfterViewInit {
                     this.isDeleted = true;
                     this.toast
                       .show(`Event deleted`, '2000', 'bottom')
-                      .subscribe((toast) => {
-                        console.log(toast);
-                      });
+                      .subscribe((toast) => {});
                   });
                 } else {
                   if (data.password == this.device_password) {
@@ -121,16 +117,12 @@ export class EventListModalPage implements AfterViewInit {
                       this.isDeleted = true;
                       this.toast
                         .show(`Event deleted`, '2000', 'bottom')
-                        .subscribe((toast) => {
-                          console.log(toast);
-                        });
+                        .subscribe((toast) => {});
                     });
                   } else {
                     this.toast
                       .show(`Invalid password`, '2000', 'bottom')
-                      .subscribe((toast) => {
-                        console.log(toast);
-                      });
+                      .subscribe((toast) => {});
                   }
                 }
               });

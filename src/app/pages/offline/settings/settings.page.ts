@@ -25,7 +25,7 @@ export class SettingsPage implements OnInit {
     this.device_password = localStorage.getItem('device_password');
     let device_timeout = localStorage.getItem('device_timeout');
     let timeoutSecs: number = +device_timeout;
-    console.log(timeoutSecs + ' secs timeout');
+    AppConfig.consoleLog(timeoutSecs + ' secs timeout');
     this.page_timeout = timeoutSecs;
     localStorage.setItem('popup_open', 'no');
   }
@@ -33,7 +33,7 @@ export class SettingsPage implements OnInit {
     this.db.dbState().subscribe((res) => {
       if (res) {
         this.db.getRoomDetail(this.device_uuid).then((res) => {
-          console.log('getRoomDetail', res);
+          AppConfig.consoleLog('getRoomDetail', res);
           this.roomName = res['room_name'];
         });
       }
@@ -60,19 +60,17 @@ export class SettingsPage implements OnInit {
           role: 'cancel',
           cssClass: 'secondary',
           handler: () => {
-            console.log('Confirm Cancel');
+            AppConfig.consoleLog('Confirm Cancel');
           },
         },
         {
           text: 'Ok',
           handler: (data: any) => {
-            console.log('Saved Information', data.name);
+            AppConfig.consoleLog('Saved Information', data.name);
             this.db.changeRoomName(data.name).then((res) => {
               this.toast
                 .show(`Room Name updated successfully`, '2000', 'bottom')
-                .subscribe((toast) => {
-                  console.log(toast);
-                });
+                .subscribe((toast) => {});
             });
           },
         },

@@ -8,6 +8,7 @@ import {
 import { DbService } from '../../../services/db/db.service';
 import { Router } from '@angular/router';
 import { Toast } from '@ionic-native/toast/ngx';
+import { AppConfig } from '../../../config/appconfig';
 @Component({
   selector: 'app-department-add',
   templateUrl: './department-add.page.html',
@@ -37,13 +38,11 @@ export class DepartmentAddPage implements OnInit {
     this.db
       .checkDepartmentExists(this.mainForm.value.dept_name)
       .then(async (res) => {
-        console.log('endDateTime', res);
+        AppConfig.consoleLog('endDateTime', res);
         if (res) {
           this.toast
             .show(`Department Name already exists.`, '2000', 'bottom')
-            .subscribe((toast) => {
-              console.log(toast);
-            });
+            .subscribe((toast) => {});
         } else {
           this.db
             .addDepartment(

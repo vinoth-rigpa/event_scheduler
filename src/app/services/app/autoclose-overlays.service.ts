@@ -26,7 +26,7 @@ export class AutocloseOverlaysService {
     private toastController: ToastController
   ) {}
   async trigger() {
-    console.log('backbutton triggered');
+    AppConfig.consoleLog('backbutton triggered');
     // close action sheet
     try {
       const element = await this.actionSheetCtrl.getTop();
@@ -53,7 +53,7 @@ export class AutocloseOverlaysService {
         return;
       }
     } catch (error) {
-      console.log(error);
+      AppConfig.consoleLog(error);
     }
 
     // close side menua

@@ -58,6 +58,7 @@ export class ApiService {
 
   get(path, baseUrl: String = '') {
     return new Promise((resolve, reject) => {
+      this.apiUrl = localStorage.getItem('api_url') + AppConfig.API_BASE_URL;
       let apiURL = this.apiUrl + path;
       if (baseUrl != '') {
         apiURL = baseUrl + AppConfig.API_BASE_URL + path;

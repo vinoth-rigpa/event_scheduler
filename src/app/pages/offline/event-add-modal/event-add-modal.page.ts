@@ -88,10 +88,10 @@ export class EventAddModalPage implements AfterViewInit {
       this.isIndeterminate = false;
       this.masterCheck = false;
     }
-    console.log('Checkbox', this.checkBoxList);
+    AppConfig.consoleLog('Checkbox', this.checkBoxList);
   }
   checkRecurring(event) {
-    console.log('Check Recurring', event.detail.checked);
+    AppConfig.consoleLog('Check Recurring', event.detail.checked);
     this.isRecurring = event.detail.checked;
   }
   ngAfterViewInit() {
@@ -102,16 +102,16 @@ export class EventAddModalPage implements AfterViewInit {
         if (res) {
           this.db.getDepartments().then((item) => {
             this.departmentData = item;
-            console.log(this.departmentData);
+            AppConfig.consoleLog('departmentData', this.departmentData);
           });
           this.event_id = moment().format('YYYYMMDDHHmmss');
-          console.log('this.event_id ', this.event_id);
+          AppConfig.consoleLog('this.event_id ', this.event_id);
         }
       });
     }, 0);
   }
   checkEventTime($event) {
-    console.log('event val ', $event.detail.value);
+    AppConfig.consoleLog('event val ', $event.detail.value);
     localStorage.setItem('popup_open', 'no');
     if (
       this.eventForm.value.start_datetime &&
@@ -119,23 +119,21 @@ export class EventAddModalPage implements AfterViewInit {
     ) {
       var eDate = new Date(this.eventForm.value.end_datetime);
       var sDate = new Date(this.eventForm.value.start_datetime);
-      console.log('sDate ', sDate);
-      console.log('eDate ', eDate);
+      AppConfig.consoleLog('sDate ', sDate);
+      AppConfig.consoleLog('eDate ', eDate);
       let startDateTime = formatDate(sDate, 'yyyy-MM-dd HH:mm', this.locale);
-      console.log('startDateTime ', startDateTime);
+      AppConfig.consoleLog('startDateTime ', startDateTime);
       let endDateTime = formatDate(eDate, 'yyyy-MM-dd HH:mm', this.locale);
-      console.log('endDateTime ', endDateTime);
+      AppConfig.consoleLog('endDateTime ', endDateTime);
       if (sDate > eDate || startDateTime == endDateTime) {
         this.toast
           .show(`End time must be greater than Start time.`, '3000', 'bottom')
-          .subscribe((toast) => {
-            console.log(toast);
-          });
+          .subscribe((toast) => {});
       } else {
         this.db
           .checkEventExists(startDateTime, endDateTime)
           .then(async (res) => {
-            console.log('endDateTime', res);
+            AppConfig.consoleLog('endDateTime', res);
             if (res) {
               this.toast
                 .show(
@@ -143,9 +141,7 @@ export class EventAddModalPage implements AfterViewInit {
                   '3000',
                   'bottom'
                 )
-                .subscribe((toast) => {
-                  console.log(toast);
-                });
+                .subscribe((toast) => {});
             }
           });
       }
@@ -163,30 +159,26 @@ export class EventAddModalPage implements AfterViewInit {
     });
   }
   async storeData() {
-    console.log(this.eventForm.value);
+    AppConfig.consoleLog(this.eventForm.value);
     var eDate = new Date(this.eventForm.value.end_datetime);
     var sDate = new Date(this.eventForm.value.start_datetime);
-    console.log('sDate ', sDate);
-    console.log('eDate ', eDate);
+    AppConfig.consoleLog('sDate ', sDate);
+    AppConfig.consoleLog('eDate ', eDate);
     let startDateTime = formatDate(sDate, 'yyyy-MM-dd HH:mm', this.locale);
-    console.log('startDateTime ', startDateTime);
+    AppConfig.consoleLog('startDateTime ', startDateTime);
     let endDateTime = formatDate(eDate, 'yyyy-MM-dd HH:mm', this.locale);
-    console.log('endDateTime ', endDateTime);
+    AppConfig.consoleLog('endDateTime ', endDateTime);
     if (sDate > eDate || startDateTime == endDateTime) {
       this.toast
         .show(`End time must be greater than Start time.`, '3000', 'bottom')
-        .subscribe((toast) => {
-          console.log(toast);
-        });
+        .subscribe((toast) => {});
     } else {
       this.db.checkEventExists(startDateTime, endDateTime).then(async (res) => {
-        console.log('endDateTime', res);
+        AppConfig.consoleLog('endDateTime', res);
         if (res) {
           this.toast
             .show(`Event already booked in this time slot.`, '3000', 'bottom')
-            .subscribe((toast) => {
-              console.log(toast);
-            });
+            .subscribe((toast) => {});
         } else {
           let loader = this.loadingCtrl.create({
             cssClass: 'custom-loader',
@@ -201,7 +193,7 @@ export class EventAddModalPage implements AfterViewInit {
             .then(async (res) => {
               (await loader).dismiss();
               if (res) {
-                console.log('dept_password ', res.dept_password);
+                AppConfig.consoleLog('dept_password ', res.dept_password);
                 localStorage.setItem('popup_open', 'no');
                 // this.modalCtrl.dismiss({ event: this.eventForm.value });
                 if (this.isRecurring) {
@@ -220,9 +212,9 @@ export class EventAddModalPage implements AfterViewInit {
                     'yyyy-MM-dd',
                     this.locale
                   );
-                  console.log('curr Date', currentDate);
+                  AppConfig.consoleLog('curr Date', currentDate);
                   let endDate = moment(currentDate).add(60, 'd').toDate();
-                  console.log('endDate ', endDate);
+                  AppConfig.consoleLog('endDate ', endDate);
                   let start = moment(currentDate);
                   let end = moment(endDate);
                   let day = 0;
@@ -233,11 +225,18 @@ export class EventAddModalPage implements AfterViewInit {
                       day = this.checkBoxList[i].number;
                       var current = start.clone();
                       if (new Date().getDay() == day) {
-                        console.log(
-                          'Start Date ',
-                          start.clone().format('yyyy-MM-DD') + ' ' + sTime,
-                          ' - ' + 'End Date ',
-                          start.clone().format('yyyy-MM-DD') + ' ' + eTime
+                        AppConfig.consoleLog(
+                          'Start Date ' +
+                            ' ' +
+                            start.clone().format('yyyy-MM-DD') +
+                            ' ' +
+                            sTime,
+                          ' - ' +
+                            'End Date ' +
+                            ' ' +
+                            start.clone().format('yyyy-MM-DD') +
+                            ' ' +
+                            eTime
                         );
                         let eventData = {
                           event_id:
@@ -259,11 +258,18 @@ export class EventAddModalPage implements AfterViewInit {
                         eventDataArr.push(eventData);
                       }
                       while (current.day(7 + day).isBefore(end)) {
-                        console.log(
-                          'Start Date ',
-                          current.clone().format('yyyy-MM-DD') + ' ' + sTime,
-                          ' - ' + 'End Date ',
-                          current.clone().format('yyyy-MM-DD') + ' ' + eTime
+                        AppConfig.consoleLog(
+                          'Start Date ' +
+                            ' ' +
+                            current.clone().format('yyyy-MM-DD') +
+                            ' ' +
+                            sTime,
+                          ' - ' +
+                            'End Date ' +
+                            ' ' +
+                            current.clone().format('yyyy-MM-DD') +
+                            ' ' +
+                            eTime
                         );
                         let eventData = {
                           event_id:
@@ -286,7 +292,7 @@ export class EventAddModalPage implements AfterViewInit {
                       }
                     }
                   }
-                  console.log('eventDataArr ', eventDataArr);
+                  AppConfig.consoleLog('eventDataArr ', eventDataArr);
                   if (eventDataArr.length > 0) {
                     this.modalCtrl.dismiss({ event: eventDataArr });
                   } else {
@@ -316,9 +322,9 @@ export class EventAddModalPage implements AfterViewInit {
                       'yyyy-MM-dd',
                       this.locale
                     );
-                    console.log('curr Date', currentDate);
+                    AppConfig.consoleLog('curr Date', currentDate);
                     let endDate = moment(currentDate).add(60, 'd').toDate();
-                    console.log('endDate ', endDate);
+                    AppConfig.consoleLog('endDate ', endDate);
                     let start = moment(currentDate);
                     let end = moment(endDate);
                     let day = 0;
@@ -329,11 +335,18 @@ export class EventAddModalPage implements AfterViewInit {
                         day = this.checkBoxList[i].number;
                         var current = start.clone();
                         if (new Date().getDay() == day) {
-                          console.log(
-                            'Start Date ',
-                            start.clone().format('yyyy-MM-DD') + ' ' + sTime,
-                            ' - ' + 'End Date ',
-                            start.clone().format('yyyy-MM-DD') + ' ' + eTime
+                          AppConfig.consoleLog(
+                            'Start Date ' +
+                              ' ' +
+                              start.clone().format('yyyy-MM-DD') +
+                              ' ' +
+                              sTime,
+                            ' - ' +
+                              'End Date ' +
+                              ' ' +
+                              start.clone().format('yyyy-MM-DD') +
+                              ' ' +
+                              eTime
                           );
                           let eventData = {
                             event_id:
@@ -355,11 +368,18 @@ export class EventAddModalPage implements AfterViewInit {
                           eventDataArr.push(eventData);
                         }
                         while (current.day(7 + day).isBefore(end)) {
-                          console.log(
+                          AppConfig.consoleLog(
                             'Start Date ',
-                            current.clone().format('yyyy-MM-DD') + ' ' + sTime,
-                            ' - ' + 'End Date ',
-                            current.clone().format('yyyy-MM-DD') + ' ' + eTime
+                            current.clone().format('yyyy-MM-DD') +
+                              ' ' +
+                              sTime +
+                              ' ' +
+                              ' - ' +
+                              'End Date ' +
+                              ' ' +
+                              current.clone().format('yyyy-MM-DD') +
+                              ' ' +
+                              eTime
                           );
                           let eventData = {
                             event_id:
@@ -386,7 +406,7 @@ export class EventAddModalPage implements AfterViewInit {
                         }
                       }
                     }
-                    console.log('eventDataArr ', eventDataArr);
+                    AppConfig.consoleLog('eventDataArr ', eventDataArr);
                     if (eventDataArr.length > 0) {
                       this.modalCtrl.dismiss({ event: eventDataArr });
                     } else {
@@ -398,9 +418,7 @@ export class EventAddModalPage implements AfterViewInit {
                 } else {
                   this.toast
                     .show(`Invalid password`, '2000', 'bottom')
-                    .subscribe((toast) => {
-                      console.log(toast);
-                    });
+                    .subscribe((toast) => {});
                 }
               }
             });

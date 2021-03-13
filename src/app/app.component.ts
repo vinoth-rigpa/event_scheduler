@@ -34,7 +34,7 @@ export class AppComponent {
       this.splashScreen.hide();
       AppConfig.consoleLog('device_uuid', this.device.uuid);
       localStorage.setItem('device_uuid', this.device.uuid);
-      console.log(
+      AppConfig.consoleLog(
         'localStorage device_timeout',
         localStorage.getItem('device_timeout')
       );
@@ -60,16 +60,16 @@ export class AppComponent {
     clearTimeout(this.idleLogoutTimer);
     let device_timeout = localStorage.getItem('device_timeout');
     let timeoutSecs: number = +device_timeout;
-    console.log(timeoutSecs + ' secs timeout restartIdleLogoutTimer');
+    AppConfig.consoleLog(timeoutSecs + ' secs timeout restartIdleLogoutTimer');
     this.idleLogoutTimer = setTimeout(() => {
       // this.redirectToHome();
     }, timeoutSecs);
   }
 
   redirectToHome() {
-    console.log('Page timeout triggered');
+    AppConfig.consoleLog('Page timeout triggered');
     if (localStorage.getItem('popup_open') == 'yes') {
-      console.log('picker opend');
+      AppConfig.consoleLog('picker opend');
     } else {
       const removeElements = (elms) => elms.forEach((el) => el.remove());
       removeElements(document.querySelectorAll('.admin-pwd-alert'));

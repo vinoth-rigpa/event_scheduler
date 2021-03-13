@@ -44,7 +44,7 @@ export class DepartmentEditPage implements OnInit {
   }
   saveForm() {
     this.db.updateDepartment(this.id, this.editForm.value).then((res) => {
-      console.log(res);
+      AppConfig.consoleLog('', res);
       this.router.navigate([`online/department`], { replaceUrl: true });
     });
   }

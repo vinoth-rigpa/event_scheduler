@@ -64,7 +64,7 @@ export class ActivationPage implements OnInit {
   ) {
     AppConfig.consoleLog('ActivationPage constructor');
     // this.platform.backButton.subscribeWithPriority(10, () => {
-    //   console.log('Handler was called!');
+    //   AppConfig.consoleLog('Handler was called!');
     // });
     this.device_uuid = localStorage.getItem('device_uuid');
   }
@@ -122,49 +122,39 @@ export class ActivationPage implements OnInit {
       this.db.checkActiveCode(this.device_uuid).then(async (res) => {
         (await loader).dismiss();
         if (res) {
-          console.log('activate code', res.activation_code);
+          AppConfig.consoleLog('activate code', res.activation_code);
           if (this.device_otp == res.activation_code) {
             this.toast
               .show(`Device Activation Success`, '2000', 'bottom')
-              .subscribe((toast) => {
-                console.log(toast);
-              });
+              .subscribe((toast) => {});
             localStorage.setItem('device_activated', 'yes');
             this.router.navigate([`/choosemode`], { replaceUrl: true });
           } else {
             if (this.device_otp == '123456') {
               this.toast
                 .show(`Device Activation Success`, '2000', 'bottom')
-                .subscribe((toast) => {
-                  console.log(toast);
-                });
+                .subscribe((toast) => {});
               localStorage.setItem('device_activated', 'yes');
               this.router.navigate([`/choosemode`], { replaceUrl: true });
             } else {
               localStorage.setItem('device_activated', 'no');
               this.toast
                 .show(`Device Activation Failed`, '2000', 'bottom')
-                .subscribe((toast) => {
-                  console.log(toast);
-                });
+                .subscribe((toast) => {});
             }
           }
         } else {
           if (this.device_otp == '123456') {
             this.toast
               .show(`Device Activation Success`, '2000', 'bottom')
-              .subscribe((toast) => {
-                console.log(toast);
-              });
+              .subscribe((toast) => {});
             localStorage.setItem('device_activated', 'yes');
             this.router.navigate([`/choosemode`], { replaceUrl: true });
           } else {
             localStorage.setItem('device_activated', 'no');
             this.toast
               .show(`Device Activation Failed`, '2000', 'bottom')
-              .subscribe((toast) => {
-                console.log(toast);
-              });
+              .subscribe((toast) => {});
           }
         }
       });

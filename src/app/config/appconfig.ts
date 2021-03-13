@@ -20,7 +20,7 @@ export class AppConfig {
         new Date().getMilliseconds() +
         '\n',
       pmMsg,
-      ' ## ',
+      ' => ',
       pmObj
     );
   }

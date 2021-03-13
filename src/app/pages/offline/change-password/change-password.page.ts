@@ -60,9 +60,7 @@ export class ChangePasswordPage implements OnInit {
       this.mainForm.reset();
       this.toast
         .show(`Password reset successfully`, '2000', 'bottom')
-        .subscribe((toast) => {
-          console.log(toast);
-        });
+        .subscribe((toast) => {});
     });
   }
 

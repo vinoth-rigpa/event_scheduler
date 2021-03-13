@@ -54,9 +54,9 @@ export class EventsCalendarPage implements OnInit {
         );
         this.db.getEvents(currentDateTime).then((item) => {
           this.eventsData = item;
-          console.log('eventData', this.eventsData);
+          AppConfig.consoleLog('eventData', this.eventsData);
           for (var i = 0; i < this.eventsData.length; i++) {
-            console.log('event', this.eventsData[i]);
+            AppConfig.consoleLog('event', this.eventsData[i]);
             this.eventSource.push({
               title: this.eventsData[i].event_name,
               startTime: new Date(this.eventsData[i].start_datetime),
@@ -64,7 +64,7 @@ export class EventsCalendarPage implements OnInit {
               allDay: false,
             });
           }
-          console.log('this.eventSource', this.eventSource);
+          AppConfig.consoleLog('this.eventSource', this.eventSource);
           this.myCal.loadEvents();
         });
       }
@@ -81,19 +81,19 @@ export class EventsCalendarPage implements OnInit {
   }
   onTimeSelected(event) {
     if (this.showEventsList) {
-      console.log('onTimeSelect ', event);
+      AppConfig.consoleLog('onTimeSelect ', event);
       this.refreshEventListData(event.selectedTime);
     }
   }
   refreshEventListData(selectedTime) {
     this.selectedTime = formatDate(selectedTime, 'yyyy-MM-dd', this.locale);
-    console.log('selectedTime ', this.selectedTime);
+    AppConfig.consoleLog('selectedTime ', this.selectedTime);
     let currentDateTime = formatDate(
       new Date(),
       'yyyy-MM-dd HH:mm',
       this.locale
     );
-    console.log('currentDateTime ', currentDateTime);
+    AppConfig.consoleLog('currentDateTime ', currentDateTime);
     this.db.dbState().subscribe((res) => {
       if (res) {
         this.db
@@ -112,7 +112,7 @@ export class EventsCalendarPage implements OnInit {
                 this.locale
               );
             }
-            console.log('eventsList', this.eventsList);
+            AppConfig.consoleLog('eventsList', this.eventsList);
             var eventsListDiv = document.getElementById('eventsList');
             if (this.eventsList.length > 0) {
               eventsListDiv.style.visibility = 'inherit';
@@ -153,17 +153,15 @@ export class EventsCalendarPage implements OnInit {
           role: 'cancel',
           cssClass: 'secondary',
           handler: () => {
-            console.log('Confirm Cancel');
+            AppConfig.consoleLog('Confirm Cancel');
           },
         },
         {
           text: 'Ok',
           handler: async (data: any) => {
-            console.log(
+            AppConfig.consoleLog(
               'Saved Information',
-              data.password,
-              event.dept_name,
-              this.device_password
+              data.password + ' ' + event.dept_name + ' ' + this.device_password
             );
             let loader = this.loadingCtrl.create({
               cssClass: 'custom-loader',
@@ -175,7 +173,7 @@ export class EventsCalendarPage implements OnInit {
               .then(async (res) => {
                 (await loader).dismiss();
                 if (res) {
-                  console.log('dept_password ', res.dept_password);
+                  AppConfig.consoleLog('dept_password ', res.dept_password);
                   this.db.deleteEvent(event.id).then(async (res) => {
                     this.eventSource = this.eventSource.filter(
                       (item) =>
@@ -188,9 +186,7 @@ export class EventsCalendarPage implements OnInit {
                     );
                     this.toast
                       .show(`Event deleted`, '2000', 'bottom')
-                      .subscribe((toast) => {
-                        console.log(toast);
-                      });
+                      .subscribe((toast) => {});
                   });
                 } else {
                   if (data.password == this.device_password) {
@@ -206,16 +202,12 @@ export class EventsCalendarPage implements OnInit {
                       );
                       this.toast
                         .show(`Event deleted`, '2000', 'bottom')
-                        .subscribe((toast) => {
-                          console.log(toast);
-                        });
+                        .subscribe((toast) => {});
                     });
                   } else {
                     this.toast
                       .show(`Invalid password`, '2000', 'bottom')
-                      .subscribe((toast) => {
-                        console.log(toast);
-                      });
+                      .subscribe((toast) => {});
                   }
                 }
               });
@@ -266,10 +258,10 @@ export class EventsCalendarPage implements OnInit {
                 allDay: false,
               });
               this.db.addEvent(event).then((res) => {
-                console.log('event add ', res);
+                AppConfig.consoleLog('event add ', res);
               });
               if (index === array.length - 1) {
-                console.log('event last one');
+                AppConfig.consoleLog('event last one');
                 this.myCal.loadEvents();
               }
             });
@@ -278,9 +270,7 @@ export class EventsCalendarPage implements OnInit {
       } else {
         this.toast
           .show(`Departments not yet added`, '2000', 'bottom')
-          .subscribe((toast) => {
-            console.log(toast);
-          });
+          .subscribe((toast) => {});
       }
     });
   }
@@ -298,17 +288,15 @@ export class EventsCalendarPage implements OnInit {
           role: 'cancel',
           cssClass: 'secondary',
           handler: () => {
-            console.log('Confirm Cancel');
+            AppConfig.consoleLog('Confirm Cancel');
           },
         },
         {
           text: 'Ok',
           handler: async (data: any) => {
-            console.log(
+            AppConfig.consoleLog(
               'Saved Information',
-              data.password,
-              event.dept_name,
-              this.device_password
+              data.password + ' ' + event.dept_name + ' ' + this.device_password
             );
             let loader = this.loadingCtrl.create({
               cssClass: 'custom-loader',
@@ -320,7 +308,7 @@ export class EventsCalendarPage implements OnInit {
               .then(async (res) => {
                 (await loader).dismiss();
                 if (res) {
-                  console.log('dept_password ', res.dept_password);
+                  AppConfig.consoleLog('dept_password ', res.dept_password);
                   const modal = await this.modalCtrl.create({
                     component: EventEditModalPage,
                     componentProps: { paramID: event.id },
@@ -348,12 +336,10 @@ export class EventsCalendarPage implements OnInit {
                       this.db
                         .updateEvent(result.data.event_id, event)
                         .then((res) => {
-                          console.log('this.res', res);
+                          AppConfig.consoleLog('this.res', res);
                           this.toast
                             .show(`Event details updated`, '2000', 'bottom')
-                            .subscribe((toast) => {
-                              console.log(toast);
-                            });
+                            .subscribe((toast) => {});
                           this.refreshEventListData(this.selectedTime);
                         });
                     }
@@ -387,12 +373,10 @@ export class EventsCalendarPage implements OnInit {
                         this.db
                           .updateEvent(result.data.event_id, event)
                           .then((res) => {
-                            console.log('this.res', res);
+                            AppConfig.consoleLog('this.res', res);
                             this.toast
                               .show(`Event details updated`, '2000', 'bottom')
-                              .subscribe((toast) => {
-                                console.log(toast);
-                              });
+                              .subscribe((toast) => {});
                             this.refreshEventListData(this.selectedTime);
                           });
                       }
@@ -400,9 +384,7 @@ export class EventsCalendarPage implements OnInit {
                   } else {
                     this.toast
                       .show(`Invalid password`, '2000', 'bottom')
-                      .subscribe((toast) => {
-                        console.log(toast);
-                      });
+                      .subscribe((toast) => {});
                   }
                 }
               });

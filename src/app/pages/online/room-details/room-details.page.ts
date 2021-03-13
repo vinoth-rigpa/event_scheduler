@@ -119,9 +119,7 @@ export class RoomDetailsPage implements OnInit {
                     this.room_details_form.reset();
                     this.toast
                       .show(`Room details added`, '2000', 'bottom')
-                      .subscribe((toast) => {
-                        console.log(toast);
-                      });
+                      .subscribe((toast) => {});
                     this.router.navigate([`online/dashboard`], {
                       replaceUrl: true,
                     });
