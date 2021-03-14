@@ -7,18 +7,20 @@ import { AppConfig } from '../../../config/appconfig';
   styleUrls: ['./splash.page.scss'],
 })
 export class SplashPage implements OnInit {
+  currentPage: string = 'SplashPage';
   constructor(private router: Router) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    AppConfig.consoleLog(this.currentPage + ' OnInit');
+  }
 
   ionViewDidEnter() {
-    AppConfig.consoleLog('ActivationPage ionViewDidEnter');
     setTimeout(() => {
       if (localStorage.getItem('device_configured') == 'yes') {
         if (localStorage.getItem('device_mode') == 'offline') {
-          this.router.navigate([`offline/dashboard`], { replaceUrl: true });
+          this.router.navigate([`offline-dashboard`], { replaceUrl: true });
         } else if (localStorage.getItem('device_mode') == 'online') {
-          this.router.navigate([`online/dashboard`], { replaceUrl: true });
+          this.router.navigate([`online-dashboard`], { replaceUrl: true });
         }
       } else {
         if (localStorage.getItem('device_activated') == 'yes') {

@@ -1,11 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import { IonicModule } from '@ionic/angular';
-
 import { ChoosemodePageRoutingModule } from './choosemode-routing.module';
-
 import { ChoosemodePage } from './choosemode.page';
 
 @NgModule({
@@ -13,8 +10,8 @@ import { ChoosemodePage } from './choosemode.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    ChoosemodePageRoutingModule
+    ChoosemodePageRoutingModule,
   ],
-  declarations: [ChoosemodePage]
+  declarations: [ChoosemodePage],
 })
 export class ChoosemodePageModule {}

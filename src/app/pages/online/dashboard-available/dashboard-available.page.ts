@@ -106,22 +106,22 @@ export class DashboardAvailablePage implements OnInit {
               .then(async (res) => {
                 AppConfig.consoleLog('releaseEventStatus', res);
               });
-            this.router.navigate([`online/dashboard-available`], {
+            this.router.navigate([`online-dashboard-available`], {
               replaceUrl: true,
             });
           } else {
             AppConfig.consoleLog('dashboard-pending ');
-            this.router.navigate([`online/dashboard-pending`], {
+            this.router.navigate([`online-dashboard-pending`], {
               replaceUrl: true,
             });
           }
         } else if (res['event_status'] == 1) {
-          this.router.navigate([`online/dashboard-occupied`], {
+          this.router.navigate([`online-dashboard-occupied`], {
             replaceUrl: true,
           });
         }
       } else {
-        this.router.navigate([`online/dashboard-available`], {
+        this.router.navigate([`online-dashboard-available`], {
           replaceUrl: true,
         });
       }
@@ -489,8 +489,8 @@ export class DashboardAvailablePage implements OnInit {
                       });
                   } else {
                     this.toast
-                      .show(`Invalid password`, '2000', 'bottom')
-                      .subscribe((toast) => {});
+                      .show(AppConfig.INVALID_PASSWORD_MSG, '2000', 'bottom')
+                      .subscribe((_) => {});
                   }
                 }
               });
@@ -560,7 +560,7 @@ export class DashboardAvailablePage implements OnInit {
                         AppConfig.consoleLog('releaseEventStatus', res);
                         this.toast
                           .show(`Event released`, '2000', 'bottom')
-                          .subscribe((toast) => {});
+                          .subscribe((_) => {});
                         this.refreshData();
                       });
                   } else {
@@ -579,13 +579,13 @@ export class DashboardAvailablePage implements OnInit {
                           AppConfig.consoleLog('updateEventStatus', res);
                           this.toast
                             .show(`Event released`, '2000', 'bottom')
-                            .subscribe((toast) => {});
+                            .subscribe((_) => {});
                           this.refreshData();
                         });
                     } else {
                       this.toast
-                        .show(`Invalid password`, '2000', 'bottom')
-                        .subscribe((toast) => {});
+                        .show(AppConfig.INVALID_PASSWORD_MSG, '2000', 'bottom')
+                        .subscribe((_) => {});
                     }
                   }
                 });
@@ -652,7 +652,7 @@ export class DashboardAvailablePage implements OnInit {
                     await modal.present();
                     modal.onDidDismiss().then((result) => {
                       AppConfig.consoleLog('extend res', result);
-                      this.router.navigate([`online/dashboard`], {
+                      this.router.navigate([`online-dashboard`], {
                         replaceUrl: true,
                       });
                     });
@@ -667,14 +667,14 @@ export class DashboardAvailablePage implements OnInit {
                       await modal.present();
                       modal.onDidDismiss().then((result) => {
                         AppConfig.consoleLog('extend res', result);
-                        this.router.navigate([`online/dashboard`], {
+                        this.router.navigate([`online-dashboard`], {
                           replaceUrl: true,
                         });
                       });
                     } else {
                       this.toast
-                        .show(`Invalid password`, '2000', 'bottom')
-                        .subscribe((toast) => {});
+                        .show(AppConfig.INVALID_PASSWORD_MSG, '2000', 'bottom')
+                        .subscribe((_) => {});
                     }
                   }
                 });
@@ -710,7 +710,7 @@ export class DashboardAvailablePage implements OnInit {
                 this.locale
               );
               this.db.bookEvent(event).then((res) => {
-                this.router.navigate([`online/dashboard`], {
+                this.router.navigate([`online-dashboard`], {
                   replaceUrl: true,
                 });
               });
@@ -719,13 +719,13 @@ export class DashboardAvailablePage implements OnInit {
         } else {
           this.toast
             .show(`Departments not yet added`, '2000', 'bottom')
-            .subscribe((toast) => {});
+            .subscribe((_) => {});
         }
       });
     }
   }
   goPage(pmPage) {
-    this.router.navigate([`online/` + pmPage], { replaceUrl: true });
+    this.router.navigate([`online-` + pmPage], { replaceUrl: true });
   }
   async openEventAddModal() {
     this.db.getDepartments().then(async (item) => {
@@ -755,7 +755,7 @@ export class DashboardAvailablePage implements OnInit {
               });
               if (index === array.length - 1) {
                 AppConfig.consoleLog('event last one');
-                this.router.navigate([`online/dashboard`], {
+                this.router.navigate([`online-dashboard`], {
                   replaceUrl: true,
                 });
               }
@@ -765,7 +765,7 @@ export class DashboardAvailablePage implements OnInit {
       } else {
         this.toast
           .show(`Departments not yet added`, '2000', 'bottom')
-          .subscribe((toast) => {});
+          .subscribe((_) => {});
       }
     });
   }
@@ -780,13 +780,13 @@ export class DashboardAvailablePage implements OnInit {
         await modal.present();
         modal.onDidDismiss().then((result) => {
           if (result.data && result.data.isDeleted) {
-            this.router.navigate([`online/dashboard`], { replaceUrl: true });
+            this.router.navigate([`online-dashboard`], { replaceUrl: true });
           }
         });
       } else {
         this.toast
           .show(`Departments not yet added`, '2000', 'bottom')
-          .subscribe((toast) => {});
+          .subscribe((_) => {});
       }
     });
   }
@@ -815,8 +815,8 @@ export class DashboardAvailablePage implements OnInit {
               this.goPage('settings');
             } else {
               this.toast
-                .show(`Invalid password`, '2000', 'bottom')
-                .subscribe((toast) => {});
+                .show(AppConfig.INVALID_PASSWORD_MSG, '2000', 'bottom')
+                .subscribe((_) => {});
             }
           },
         },

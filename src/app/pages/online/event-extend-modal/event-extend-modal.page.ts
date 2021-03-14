@@ -132,7 +132,7 @@ export class EventExtendModalPage implements AfterViewInit {
         if (eDate >= sDate) {
           this.toast
             .show(`Can't extend beyond next event start time`, '2000', 'bottom')
-            .subscribe((toast) => {});
+            .subscribe((_) => {});
         } else {
           this.db
             .extendEventStatus(this.currentEventData?.id, endDateTime)
@@ -144,7 +144,7 @@ export class EventExtendModalPage implements AfterViewInit {
                   '3000',
                   'bottom'
                 )
-                .subscribe((toast) => {});
+                .subscribe((_) => {});
               this.modalCtrl.dismiss({ event: res });
             });
         }
@@ -180,7 +180,7 @@ export class EventExtendModalPage implements AfterViewInit {
                 '3000',
                 'bottom'
               )
-              .subscribe((toast) => {});
+              .subscribe((_) => {});
             this.modalCtrl.dismiss({ event: res });
           });
       }

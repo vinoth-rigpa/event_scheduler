@@ -100,7 +100,7 @@ export class EventBookModalPage implements AfterViewInit {
       if (sDate > eDate || startDateTime == endDateTime) {
         this.toast
           .show(`End time must be greater than Start time.`, '3000', 'bottom')
-          .subscribe((toast) => {});
+          .subscribe((_) => {});
       } else {
         this.db
           .checkEventExists(startDateTime, endDateTime)
@@ -113,7 +113,7 @@ export class EventBookModalPage implements AfterViewInit {
                   '3000',
                   'bottom'
                 )
-                .subscribe((toast) => {});
+                .subscribe((_) => {});
             }
           });
       }
@@ -132,14 +132,14 @@ export class EventBookModalPage implements AfterViewInit {
     if (sDate > eDate || startDateTime == endDateTime) {
       this.toast
         .show(`End time must be greater than Start time`, '3000', 'bottom')
-        .subscribe((toast) => {});
+        .subscribe((_) => {});
     } else {
       this.db.checkEventExists(startDateTime, endDateTime).then(async (res) => {
         AppConfig.consoleLog('endDateTime', res);
         if (res) {
           this.toast
             .show(`Event already booked in this time slot.`, '3000', 'bottom')
-            .subscribe((toast) => {});
+            .subscribe((_) => {});
         } else {
           let loader = this.loadingCtrl.create({
             cssClass: 'custom-loader',
@@ -165,8 +165,8 @@ export class EventBookModalPage implements AfterViewInit {
                   this.modalCtrl.dismiss({ event: this.eventForm.value });
                 } else {
                   this.toast
-                    .show(`Invalid password`, '2000', 'bottom')
-                    .subscribe((toast) => {});
+                    .show(AppConfig.INVALID_PASSWORD_MSG, '2000', 'bottom')
+                    .subscribe((_) => {});
                 }
               }
             });

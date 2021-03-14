@@ -106,7 +106,7 @@ export class EventListModalPage implements AfterViewInit {
                     this.isDeleted = true;
                     this.toast
                       .show(`Event deleted`, '2000', 'bottom')
-                      .subscribe((toast) => {});
+                      .subscribe((_) => {});
                   });
                 } else {
                   if (data.password == this.device_password) {
@@ -117,12 +117,12 @@ export class EventListModalPage implements AfterViewInit {
                       this.isDeleted = true;
                       this.toast
                         .show(`Event deleted`, '2000', 'bottom')
-                        .subscribe((toast) => {});
+                        .subscribe((_) => {});
                     });
                   } else {
                     this.toast
-                      .show(`Invalid password`, '2000', 'bottom')
-                      .subscribe((toast) => {});
+                      .show(AppConfig.INVALID_PASSWORD_MSG, '2000', 'bottom')
+                      .subscribe((_) => {});
                   }
                 }
               });

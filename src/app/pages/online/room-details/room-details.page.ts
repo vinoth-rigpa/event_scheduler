@@ -63,7 +63,7 @@ export class RoomDetailsPage implements OnInit {
   }
 
   goPage() {
-    this.router.navigate([`online/dashboard`], { replaceUrl: true });
+    this.router.navigate([`online-dashboard`], { replaceUrl: true });
   }
 
   async storeData() {
@@ -119,8 +119,8 @@ export class RoomDetailsPage implements OnInit {
                     this.room_details_form.reset();
                     this.toast
                       .show(`Room details added`, '2000', 'bottom')
-                      .subscribe((toast) => {});
-                    this.router.navigate([`online/dashboard`], {
+                      .subscribe((_) => {});
+                    this.router.navigate([`online-dashboard`], {
                       replaceUrl: true,
                     });
                   });

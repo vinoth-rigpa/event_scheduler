@@ -1,13 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import { DepartmentEditPage } from './department-edit.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: DepartmentEditPage
-  }
+    component: DepartmentEditPage,
+  },
 ];
 
 @NgModule({

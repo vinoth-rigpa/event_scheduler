@@ -9,6 +9,10 @@ export class AppConfig {
   public static UNKONWN_ERROR =
     'Internet connection unavailable. Please try after sometime.';
   public static UNKONWN_ERROR_HEADING = "Can't connect to the internet";
+  public static ACTIVATION_SUCCESS_MSG = 'Device Activation Success';
+  public static ACTIVATION_FAILED_MSG = 'Device Activation Failed';
+  public static RESET_PASSWORD_SUCCESS_MSG = 'Password reset successfully';
+  public static INVALID_PASSWORD_MSG = 'Invalid password';
   public static consoleLog(pmMsg = '', pmObj = null) {
     console.log(
       new Date().getHours() +

@@ -9,17 +9,20 @@ import { Toast } from '@ionic-native/toast/ngx';
 import { DbService } from '../../../services/db/db.service';
 import { AppConfig } from '../../../config/appconfig';
 import { Event } from '../../../models/event';
+
 @Component({
   selector: 'app-event-list-modal',
   templateUrl: './event-list-modal.page.html',
   styleUrls: ['./event-list-modal.page.scss'],
 })
 export class EventListModalPage implements AfterViewInit {
+  currentPage: string = 'Offline EventExtendModalPage';
   device_uuid: any = '';
   device_password: any = '';
   modalReady = false;
   isDeleted = false;
   eventsList: Event[] = [];
+
   constructor(
     private db: DbService,
     public loadingCtrl: LoadingController,
@@ -28,11 +31,14 @@ export class EventListModalPage implements AfterViewInit {
     private toast: Toast,
     private modalCtrl: ModalController
   ) {
-    AppConfig.consoleLog('EventAddModalPage constructor');
     this.device_uuid = localStorage.getItem('device_uuid');
     this.device_password = localStorage.getItem('device_password');
-    AppConfig.consoleLog('this.device_password', this.device_password);
   }
+
+  ngOnInit() {
+    AppConfig.consoleLog(this.currentPage + ' OnInit');
+  }
+
   ngAfterViewInit() {
     setTimeout(() => {
       this.modalReady = true;
@@ -57,15 +63,13 @@ export class EventListModalPage implements AfterViewInit {
                 this.locale
               );
             }
-            AppConfig.consoleLog('eventsList', this.eventsList);
           });
         }
       });
     }, 0);
   }
-  ngOnInit() {}
+
   async deleteEventByID(event: Event) {
-    AppConfig.consoleLog('' + event.id);
     const alert = await this.alertCtrl.create({
       cssClass: 'admin-pwd-alert',
       message: 'Are you sure you want to delete?',
@@ -77,17 +81,11 @@ export class EventListModalPage implements AfterViewInit {
           text: 'Cancel',
           role: 'cancel',
           cssClass: 'secondary',
-          handler: () => {
-            AppConfig.consoleLog('Confirm Cancel');
-          },
+          handler: () => {},
         },
         {
           text: 'Ok',
           handler: async (data: any) => {
-            AppConfig.consoleLog(
-              'Saved Information',
-              data.password + ' ' + event.dept_name + ' ' + this.device_password
-            );
             let loader = this.loadingCtrl.create({
               cssClass: 'custom-loader',
               spinner: 'lines-small',
@@ -98,7 +96,6 @@ export class EventListModalPage implements AfterViewInit {
               .then(async (res) => {
                 (await loader).dismiss();
                 if (res) {
-                  AppConfig.consoleLog('dept_password ', res.dept_password);
                   this.db.deleteEvent(event.id).then(async (res) => {
                     this.eventsList = this.eventsList.filter(
                       (item) => item.id !== event.id
@@ -106,7 +103,7 @@ export class EventListModalPage implements AfterViewInit {
                     this.isDeleted = true;
                     this.toast
                       .show(`Event deleted`, '2000', 'bottom')
-                      .subscribe((toast) => {});
+                      .subscribe((_) => {});
                   });
                 } else {
                   if (data.password == this.device_password) {
@@ -117,12 +114,12 @@ export class EventListModalPage implements AfterViewInit {
                       this.isDeleted = true;
                       this.toast
                         .show(`Event deleted`, '2000', 'bottom')
-                        .subscribe((toast) => {});
+                        .subscribe((_) => {});
                     });
                   } else {
                     this.toast
-                      .show(`Invalid password`, '2000', 'bottom')
-                      .subscribe((toast) => {});
+                      .show(AppConfig.INVALID_PASSWORD_MSG, '2000', 'bottom')
+                      .subscribe((_) => {});
                   }
                 }
               });
@@ -132,6 +129,7 @@ export class EventListModalPage implements AfterViewInit {
     });
     await alert.present();
   }
+
   close() {
     this.modalCtrl.dismiss({ isDeleted: this.isDeleted });
   }

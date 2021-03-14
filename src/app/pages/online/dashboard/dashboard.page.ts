@@ -15,7 +15,7 @@ export class DashboardPage implements OnInit {
     private db: DbService,
     private router: Router
   ) {
-    AppConfig.consoleLog('DashboardPage constructor');
+    AppConfig.consoleLog('Online DashboardPage constructor');
   }
 
   ngOnInit() {
@@ -26,30 +26,25 @@ export class DashboardPage implements OnInit {
           'yyyy-MM-dd HH:mm',
           this.locale
         );
-        AppConfig.consoleLog('curr time', currentDateTime);
         this.db.getEventStatus(currentDateTime).then((res) => {
           AppConfig.consoleLog('getEventStatus', res);
           if (res) {
             if (res['event_status'] == 0) {
-              this.router.navigate([`online/dashboard-pending`], {
+              this.router.navigate([`online-dashboard-pending`], {
                 replaceUrl: true,
               });
             } else if (res['event_status'] == 1) {
-              this.router.navigate([`online/dashboard-occupied`], {
+              this.router.navigate([`online-dashboard-occupied`], {
                 replaceUrl: true,
               });
             }
           } else {
-            this.router.navigate([`online/dashboard-available`], {
+            this.router.navigate([`online-dashboard-available`], {
               replaceUrl: true,
             });
           }
         });
       }
     });
-  }
-
-  ionViewDidEnter() {
-    AppConfig.consoleLog('DashboardPage ionViewDidEnter');
   }
 }

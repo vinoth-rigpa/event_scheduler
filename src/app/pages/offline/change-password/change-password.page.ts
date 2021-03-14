@@ -8,6 +8,7 @@ import {
 import { DbService } from '../../../services/db/db.service';
 import { Router } from '@angular/router';
 import { Toast } from '@ionic-native/toast/ngx';
+import { AppConfig } from '../../../config/appconfig';
 
 @Component({
   selector: 'app-change-password',
@@ -15,6 +16,7 @@ import { Toast } from '@ionic-native/toast/ngx';
   styleUrls: ['./change-password.page.scss'],
 })
 export class ChangePasswordPage implements OnInit {
+  currentPage: string = 'ChangePasswordPage';
   mainForm: FormGroup;
   validation_messages = {
     current_password: [
@@ -34,6 +36,7 @@ export class ChangePasswordPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    AppConfig.consoleLog(this.currentPage + ' OnInit');
     this.mainForm = this.formBuilder.group(
       {
         current_password: new FormControl('', Validators.required),
@@ -59,12 +62,12 @@ export class ChangePasswordPage implements OnInit {
       localStorage.setItem('device_password', this.mainForm.value.new_password);
       this.mainForm.reset();
       this.toast
-        .show(`Password reset successfully`, '2000', 'bottom')
-        .subscribe((toast) => {});
+        .show(AppConfig.RESET_PASSWORD_SUCCESS_MSG, '2000', 'bottom')
+        .subscribe((_) => {});
     });
   }
 
   goBack() {
-    this.router.navigate([`offline/settings`], { replaceUrl: true });
+    this.router.navigate([`offline-settings`], { replaceUrl: true });
   }
 }

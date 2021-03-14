@@ -23,7 +23,7 @@ export class ApiService {
   UPDATE_EVENT_TABLE = 'updateEventTable';
   UPDATE_DEPT_TABLE = 'updateDeptTable';
   GET_DEPT_LIST = 'getDeptList';
-  CHANGE_ROOM_NAME = 'changeRoomName';
+  CHANGE_ROOM_NAME = 'changeDeviceConfig';
   apiUrl: string;
 
   constructor(
@@ -66,7 +66,10 @@ export class ApiService {
       AppConfig.consoleLog('API_URL-->', apiURL);
       this.http.get(apiURL, {}, {}).then(
         (res) => {
-          AppConfig.consoleLog('API_OUTPUT_DATA-->', JSON.stringify(res.data));
+          AppConfig.consoleLog(
+            'API_OUTPUT_DATA ' + this.IsJsonString(res.data) + ' --> ',
+            JSON.stringify(res.data)
+          );
           if (this.IsJsonString(res.data)) {
             resolve(JSON.parse(res.data));
           } else {
@@ -96,7 +99,7 @@ export class ApiService {
           .then(
             (res) => {
               AppConfig.consoleLog(
-                'API_OUTPUT_DATA-->',
+                'API_OUTPUT_DATA ' + this.IsJsonString(res.data) + ' --> ',
                 JSON.stringify(res.data)
               );
               if (this.IsJsonString(res.data)) {
@@ -118,7 +121,7 @@ export class ApiService {
           .then(
             (res) => {
               AppConfig.consoleLog(
-                'API_OUTPUT_DATA-->',
+                'API_OUTPUT_DATA ' + this.IsJsonString(res.data) + ' --> ',
                 JSON.stringify(res.data)
               );
               if (this.IsJsonString(res.data)) {

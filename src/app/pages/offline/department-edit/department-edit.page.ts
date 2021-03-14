@@ -8,12 +8,14 @@ import {
 import { DbService } from '../../../services/db/db.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppConfig } from '../../../config/appconfig';
+
 @Component({
   selector: 'app-department-edit',
   templateUrl: './department-edit.page.html',
   styleUrls: ['./department-edit.page.scss'],
 })
 export class DepartmentEditPage implements OnInit {
+  currentPage: string = 'Offline DepartmentEditPage';
   editForm: FormGroup;
   id: any;
   validation_messages = {
@@ -22,6 +24,7 @@ export class DepartmentEditPage implements OnInit {
       { type: 'required', message: 'Department password is required.' },
     ],
   };
+
   constructor(
     private db: DbService,
     private router: Router,
@@ -36,19 +39,22 @@ export class DepartmentEditPage implements OnInit {
       });
     });
   }
+
   ngOnInit() {
+    AppConfig.consoleLog(this.currentPage + ' OnInit');
     this.editForm = this.formBuilder.group({
       dept_name: new FormControl('', Validators.required),
       dept_password: new FormControl('', Validators.required),
     });
   }
+
   saveForm() {
-    this.db.updateDepartment(this.id, this.editForm.value).then((res) => {
-      AppConfig.consoleLog('res', res);
-      this.router.navigate([`offline/department`], { replaceUrl: true });
+    this.db.updateDepartment(this.id, this.editForm.value).then((_) => {
+      this.router.navigate([`offline-department`], { replaceUrl: true });
     });
   }
+
   goBack() {
-    this.router.navigate([`offline/department`], { replaceUrl: true });
+    this.router.navigate([`offline-department`], { replaceUrl: true });
   }
 }

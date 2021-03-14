@@ -9,6 +9,7 @@ import { EventAddModalPageModule } from '../event-add-modal/event-add-modal.modu
 import { registerLocaleData } from '@angular/common';
 import localeEn from '@angular/common/locales/en';
 registerLocaleData(localeEn);
+
 @NgModule({
   imports: [
     CommonModule,

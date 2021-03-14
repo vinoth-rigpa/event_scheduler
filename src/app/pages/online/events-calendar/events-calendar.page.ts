@@ -186,7 +186,7 @@ export class EventsCalendarPage implements OnInit {
                     );
                     this.toast
                       .show(`Event deleted`, '2000', 'bottom')
-                      .subscribe((toast) => {});
+                      .subscribe((_) => {});
                   });
                 } else {
                   if (data.password == this.device_password) {
@@ -202,12 +202,12 @@ export class EventsCalendarPage implements OnInit {
                       );
                       this.toast
                         .show(`Event deleted`, '2000', 'bottom')
-                        .subscribe((toast) => {});
+                        .subscribe((_) => {});
                     });
                   } else {
                     this.toast
-                      .show(`Invalid password`, '2000', 'bottom')
-                      .subscribe((toast) => {});
+                      .show(AppConfig.INVALID_PASSWORD_MSG, '2000', 'bottom')
+                      .subscribe((_) => {});
                   }
                 }
               });
@@ -270,7 +270,7 @@ export class EventsCalendarPage implements OnInit {
       } else {
         this.toast
           .show(`Departments not yet added`, '2000', 'bottom')
-          .subscribe((toast) => {});
+          .subscribe((_) => {});
       }
     });
   }
@@ -339,7 +339,7 @@ export class EventsCalendarPage implements OnInit {
                           AppConfig.consoleLog('this.res', res);
                           this.toast
                             .show(`Event details updated`, '2000', 'bottom')
-                            .subscribe((toast) => {});
+                            .subscribe((_) => {});
                           this.refreshEventListData(this.selectedTime);
                         });
                     }
@@ -376,15 +376,15 @@ export class EventsCalendarPage implements OnInit {
                             AppConfig.consoleLog('this.res', res);
                             this.toast
                               .show(`Event details updated`, '2000', 'bottom')
-                              .subscribe((toast) => {});
+                              .subscribe((_) => {});
                             this.refreshEventListData(this.selectedTime);
                           });
                       }
                     });
                   } else {
                     this.toast
-                      .show(`Invalid password`, '2000', 'bottom')
-                      .subscribe((toast) => {});
+                      .show(AppConfig.INVALID_PASSWORD_MSG, '2000', 'bottom')
+                      .subscribe((_) => {});
                   }
                 }
               });
@@ -395,6 +395,6 @@ export class EventsCalendarPage implements OnInit {
     await alert.present();
   }
   goBack() {
-    this.router.navigate([`online/dashboard`], { replaceUrl: true });
+    this.router.navigate([`online-dashboard`], { replaceUrl: true });
   }
 }

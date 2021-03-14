@@ -1,13 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import { ChoosemodePage } from './choosemode.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: ChoosemodePage
-  }
+    component: ChoosemodePage,
+  },
 ];
 
 @NgModule({

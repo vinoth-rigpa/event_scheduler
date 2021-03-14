@@ -31,7 +31,6 @@ export class DbService {
         })
         .then((db: SQLiteObject) => {
           this.storage = db;
-          AppConfig.consoleLog('db => ', this.storage);
           this.httpClient
             .get('assets/db/dump.sql', { responseType: 'text' })
             .subscribe((data) => {
@@ -358,7 +357,6 @@ export class DbService {
 
   // Get single object
   getEvent(id): Promise<Event> {
-    AppConfig.consoleLog('getEvent', id);
     return this.storage
       .executeSql('SELECT * FROM events WHERE id = ?', [id])
       .then((res) => {
@@ -411,7 +409,6 @@ export class DbService {
     return this.storage
       .executeSql('SELECT * FROM events ORDER BY id DESC LIMIT 1', [])
       .then((res) => {
-        AppConfig.consoleLog('res', res.rows.item(0));
         if (res.rows.length > 0) {
           return {
             id: res.rows.item(0).id,
@@ -460,7 +457,6 @@ export class DbService {
   }
 
   checkEventExists(pmStartDatetime, pmEndDatetime): Promise<Event> {
-    AppConfig.consoleLog('strftime ', pmStartDatetime + ' ' + pmEndDatetime);
     return this.storage
       .executeSql(
         "SELECT * FROM events WHERE event_status != 2 AND (((strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime)) OR (strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime)) OR (strftime('%s', start_datetime) BETWEEN strftime('%s', ?) AND  strftime('%s', ?)) OR (strftime('%s', end_datetime) BETWEEN strftime('%s', ?) AND  strftime('%s', ?))))",
@@ -474,7 +470,6 @@ export class DbService {
         ]
       )
       .then((res) => {
-        AppConfig.consoleLog('res', res.rows.item(0));
         if (res.rows.length > 0) {
           return {
             id: res.rows.item(0).id,
@@ -497,10 +492,6 @@ export class DbService {
     pmStartDatetime,
     pmEndDatetime
   ): Promise<Event> {
-    AppConfig.consoleLog(
-      'strftime ',
-      eventId + ' ' + pmStartDatetime + ' ' + pmEndDatetime
-    );
     return this.storage
       .executeSql(
         "SELECT * FROM events WHERE event_id != ? AND event_status != 2 AND (((strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime)) OR (strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime)) OR (strftime('%s', start_datetime) BETWEEN strftime('%s', ?) AND  strftime('%s', ?)) OR (strftime('%s', end_datetime) BETWEEN strftime('%s', ?) AND  strftime('%s', ?))))",
@@ -515,7 +506,6 @@ export class DbService {
         ]
       )
       .then((res) => {
-        AppConfig.consoleLog('res', res.rows.item(0));
         if (res.rows.length > 0) {
           return {
             id: res.rows.item(0).id,
@@ -534,14 +524,12 @@ export class DbService {
   }
 
   getEventStatus(pmDatetime): Promise<Event> {
-    AppConfig.consoleLog('strftime', pmDatetime);
     return this.storage
       .executeSql(
         "SELECT * FROM events WHERE event_status != 2 AND (strftime('%s', ?) = strftime('%s', start_datetime) OR strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime))",
         [pmDatetime, pmDatetime]
       )
       .then((res) => {
-        AppConfig.consoleLog('res', res.rows.item(0));
         if (res.rows.length > 0) {
           return {
             id: res.rows.item(0).id,

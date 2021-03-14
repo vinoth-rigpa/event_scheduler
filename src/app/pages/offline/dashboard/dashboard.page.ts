@@ -10,15 +10,15 @@ import { DbService } from '../../../services/db/db.service';
   styleUrls: ['./dashboard.page.scss'],
 })
 export class DashboardPage implements OnInit {
+  currentPage: string = 'Offline DashboardPage';
   constructor(
     @Inject(LOCALE_ID) private locale: string,
     private db: DbService,
     private router: Router
-  ) {
-    AppConfig.consoleLog('DashboardPage constructor');
-  }
+  ) {}
 
   ngOnInit() {
+    AppConfig.consoleLog(this.currentPage + ' OnInit');
     this.db.dbState().subscribe((res) => {
       if (res) {
         let currentDateTime = formatDate(
@@ -26,30 +26,25 @@ export class DashboardPage implements OnInit {
           'yyyy-MM-dd HH:mm',
           this.locale
         );
-        AppConfig.consoleLog('curr time', currentDateTime);
         this.db.getEventStatus(currentDateTime).then((res) => {
           AppConfig.consoleLog('getEventStatus', res);
           if (res) {
             if (res['event_status'] == 0) {
-              this.router.navigate([`offline/dashboard-pending`], {
+              this.router.navigate([`offline-dashboard-pending`], {
                 replaceUrl: true,
               });
             } else if (res['event_status'] == 1) {
-              this.router.navigate([`offline/dashboard-occupied`], {
+              this.router.navigate([`offline-dashboard-occupied`], {
                 replaceUrl: true,
               });
             }
           } else {
-            this.router.navigate([`offline/dashboard-available`], {
+            this.router.navigate([`offline-dashboard-available`], {
               replaceUrl: true,
             });
           }
         });
       }
     });
-  }
-
-  ionViewDidEnter() {
-    AppConfig.consoleLog('DashboardPage ionViewDidEnter');
   }
 }

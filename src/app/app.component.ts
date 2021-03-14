@@ -89,9 +89,9 @@ export class AppComponent {
 
       if (localStorage.getItem('device_configured') == 'yes') {
         if (localStorage.getItem('device_mode') == 'offline') {
-          this.router.navigate([`offline/dashboard`], { replaceUrl: true });
+          this.router.navigate([`offline-dashboard`], { replaceUrl: true });
         } else if (localStorage.getItem('device_mode') == 'online') {
-          this.router.navigate([`online/dashboard`], { replaceUrl: true });
+          this.router.navigate([`online-dashboard`], { replaceUrl: true });
         }
       } else {
         if (localStorage.getItem('device_activated') == 'yes') {

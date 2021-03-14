@@ -12,7 +12,7 @@
   </ion-toolbar>
 </ion-header>
 <ion-content>
-  <ion-list *ngIf="departmentData.length>0;else no_records">
+  <ion-list *ngIf="departmentData.length>0">
     <ion-item lines="inset" *ngFor="let data of departmentData">
       <ion-label>
         <h5>{{data.dept_name}}</h5>
@@ -23,22 +23,24 @@
           class="edit-icon"
           name="create-outline"
           style="zoom: 1.5"
-          [routerLink]="['/department-edit/', data.id]"
+          [routerLink]="['/online-department-edit/', data.id]"
         ></ion-icon>
         <ion-icon
           class="delete-icon"
           name="trash-outline"
           style="zoom: 1.5"
-          (click)="deleteDepartment(data.id)"
+          (click)="deleteDepartment(data)"
         ></ion-icon>
       </div>
     </ion-item>
   </ion-list>
-  <ng-template #no_records>
-    <div id="no_records">
-      <h2>
-        Departments not yet added.<br /><br />Use (+) icon to add department
-      </h2>
-    </div>
-  </ng-template>
+  <div
+    id="no_records"
+    class="no_departments"
+    style="visibility: hidden; width: 0; height: 0"
+  >
+    <h2>
+      Departments not yet added.<br /><br />Use (+) icon to add department
+    </h2>
+  </div>
 </ion-content>

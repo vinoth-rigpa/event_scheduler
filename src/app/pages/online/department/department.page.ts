@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Department } from 'src/app/models/department';
+import { Department } from '../../../models/department';
 import { Platform, AlertController, LoadingController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Toast } from '@ionic-native/toast/ngx';
@@ -30,19 +30,12 @@ export class DepartmentPage implements OnInit {
     private router: Router,
     private toast: Toast
   ) {
-    AppConfig.consoleLog('DepartmentPage constructor');
+    AppConfig.consoleLog('Online DepartmentPage constructor');
     this.device_uuid = localStorage.getItem('device_uuid');
   }
-  ngOnInit() {
-    this.getDepartments();
-    this.db.dbState().subscribe((res) => {
-      if (res) {
-        this.db.getDepartments().then((item) => {
-          this.departmentData = item;
-        });
-      }
-    });
-  }
+
+  ngOnInit() {}
+
   async getDepartments() {
     if (this.networkAvailable) {
       let loader = this.loadingCtrl.create({
@@ -53,29 +46,74 @@ export class DepartmentPage implements OnInit {
 
       this.apiService.getDeptList().then(
         async (res: any) => {
-          AppConfig.consoleLog(' success ==> ', res);
+          AppConfig.consoleLog(' success ', res);
+          if (res?.departmentList && res.departmentList.length > 0) {
+            for (let i = 0; i < res.departmentList.length; i++) {
+              this.db
+                .checkDepartmentExists(res.departmentList[i].department)
+                .then(async (res1) => {
+                  if (res1) {
+                    AppConfig.consoleLog('Department exists');
+                    if (i == res.departmentList.length - 1) {
+                      this.fetchDepartments();
+                    }
+                  } else {
+                    this.db
+                      .addDepartment(
+                        res.departmentList[i].department,
+                        res.departmentList[i].password
+                      )
+                      .then((res2) => {
+                        if (i == res.departmentList.length - 1) {
+                          this.fetchDepartments();
+                        }
+                      });
+                  }
+                });
+            }
+          } else {
+            this.fetchDepartments();
+          }
+          (await loader).dismiss();
         },
         async (err) => {
-          AppConfig.consoleLog(' error ==> ', err);
+          AppConfig.consoleLog(' error ', err);
           (await loader).dismiss();
+          this.fetchDepartments();
         }
       );
     } else {
-      const alert = this.alertCtrl.create({
-        header: AppConfig.UNKONWN_ERROR_HEADING,
-        message: AppConfig.UNKONWN_ERROR,
-        buttons: [
-          {
-            text: 'Ok',
-            handler: () => {},
-          },
-        ],
-      });
-      (await alert).present();
+      this.toast
+        .show(`No internet available`, '2000', 'bottom')
+        .subscribe((_) => {});
+      this.fetchDepartments();
     }
   }
-  async deleteDepartment(id) {
-    AppConfig.consoleLog(id);
+
+  fetchDepartments() {
+    this.db.getDepartments().then((item) => {
+      this.departmentData = item;
+      if (this.departmentData.length > 0) {
+        let no_departments = document.getElementsByClassName('no_departments');
+        for (let i = 0; i < no_departments.length; ++i) {
+          let item = no_departments[i];
+          item.setAttribute('style', 'visibility:hidden;width:0;height:0;');
+        }
+      } else {
+        let no_departments = document.getElementsByClassName('no_departments');
+        for (let i = 0; i < no_departments.length; ++i) {
+          let item = no_departments[i];
+          item.setAttribute(
+            'style',
+            'visibility:visible;width:100%;height:100%;'
+          );
+        }
+      }
+    });
+  }
+
+  async deleteDepartment(item) {
+    AppConfig.consoleLog(item.id);
     const alert = await this.alertCtrl.create({
       cssClass: 'admin-pwd-alert',
       message: 'Are you sure you want to delete?',
@@ -90,16 +128,45 @@ export class DepartmentPage implements OnInit {
         },
         {
           text: 'Ok',
-          handler: () => {
+          handler: async () => {
             AppConfig.consoleLog('Confirm Okay');
-            this.db.deleteDepartment(id).then(async (res) => {
-              this.db.getDepartments().then((item) => {
-                this.departmentData = item;
-                this.toast
-                  .show(`Department deleted`, '2000', 'bottom')
-                  .subscribe((toast) => {});
+            if (this.networkAvailable) {
+              let loader = this.loadingCtrl.create({
+                cssClass: 'custom-loader',
+                spinner: 'lines-small',
               });
-            });
+              (await loader).present();
+
+              this.apiService
+                .updateDeptTable('delete', [
+                  {
+                    department: item.dept_name,
+                    password: item.dept_password,
+                  },
+                ])
+                .then(
+                  async (res: any) => {
+                    AppConfig.consoleLog(' success ', res);
+                    if (res?.status == 'success') {
+                      this.db.deleteDepartment(item.id).then(async (res) => {
+                        this.fetchDepartments();
+                        this.toast
+                          .show(`Department deleted`, '2000', 'bottom')
+                          .subscribe((_) => {});
+                      });
+                    }
+                    (await loader).dismiss();
+                  },
+                  async (err) => {
+                    AppConfig.consoleLog(' error ', err);
+                    (await loader).dismiss();
+                  }
+                );
+            } else {
+              this.toast
+                .show(`No internet available`, '2000', 'bottom')
+                .subscribe((_) => {});
+            }
           },
         },
       ],
@@ -107,10 +174,10 @@ export class DepartmentPage implements OnInit {
     await alert.present();
   }
   addDepartmentPage() {
-    this.router.navigate([`online/department-add`], { replaceUrl: true });
+    this.router.navigate([`online-department-add`], { replaceUrl: true });
   }
   goBack() {
-    this.router.navigate([`online/settings`], { replaceUrl: true });
+    this.router.navigate([`online-settings`], { replaceUrl: true });
   }
 
   isConnected(): boolean {
@@ -154,6 +221,7 @@ export class DepartmentPage implements OnInit {
       AppConfig.consoleLog('Network unavailable');
     }
     this.networkSubscribe();
+    this.getDepartments();
   }
 
   ionViewWillLeave() {
