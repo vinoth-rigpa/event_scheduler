@@ -1,13 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import { EventBookModalPage } from './event-book-modal.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: EventBookModalPage
-  }
+    component: EventBookModalPage,
+  },
 ];
 
 @NgModule({

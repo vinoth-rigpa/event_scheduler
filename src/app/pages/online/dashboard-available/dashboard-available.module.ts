@@ -6,6 +6,7 @@ import { DashboardAvailablePageRoutingModule } from './dashboard-available-routi
 import { DashboardAvailablePage } from './dashboard-available.page';
 import { EventAddModalPageModule } from '../event-add-modal/event-add-modal.module';
 import { EventListModalPageModule } from '../event-list-modal/event-list-modal.module';
+
 @NgModule({
   imports: [
     CommonModule,

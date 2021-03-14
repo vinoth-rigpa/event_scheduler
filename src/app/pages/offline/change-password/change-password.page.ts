@@ -16,7 +16,7 @@ import { AppConfig } from '../../../config/appconfig';
   styleUrls: ['./change-password.page.scss'],
 })
 export class ChangePasswordPage implements OnInit {
-  currentPage: string = 'ChangePasswordPage';
+  currentPage: string = 'Offline ChangePasswordPage';
   mainForm: FormGroup;
   validation_messages = {
     current_password: [

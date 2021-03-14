@@ -10,15 +10,15 @@ import { DbService } from '../../../services/db/db.service';
   styleUrls: ['./dashboard.page.scss'],
 })
 export class DashboardPage implements OnInit {
+  currentPage: string = 'Online ChangePasswordPage';
   constructor(
     @Inject(LOCALE_ID) private locale: string,
     private db: DbService,
     private router: Router
-  ) {
-    AppConfig.consoleLog('Online DashboardPage constructor');
-  }
+  ) {}
 
   ngOnInit() {
+    AppConfig.consoleLog(this.currentPage + ' OnInit');
     this.db.dbState().subscribe((res) => {
       if (res) {
         let currentDateTime = formatDate(

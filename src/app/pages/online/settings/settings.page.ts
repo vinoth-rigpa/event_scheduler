@@ -7,12 +7,14 @@ import { DbService } from '../../../services/db/db.service';
 import { Subscription } from 'rxjs';
 import { Network } from '@ionic-native/network/ngx';
 import { ApiService } from '../../../services/api/api.service';
+
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.page.html',
   styleUrls: ['./settings.page.scss'],
 })
 export class SettingsPage implements OnInit {
+  currentPage: string = 'Online SettingsPage';
   device_uuid: any = '';
   room_id: any = '';
   device_password: any = '';
@@ -32,13 +34,11 @@ export class SettingsPage implements OnInit {
     private router: Router,
     private toast: Toast
   ) {
-    AppConfig.consoleLog('Online SettingsPage constructor');
     this.device_uuid = localStorage.getItem('device_uuid');
     this.room_id = localStorage.getItem('room_id');
     this.device_password = localStorage.getItem('device_password');
     let device_timeout = localStorage.getItem('device_timeout');
     let timeoutSecs: number = +device_timeout;
-    AppConfig.consoleLog(timeoutSecs + ' secs timeout');
     this.page_timeout = timeoutSecs;
     localStorage.setItem('popup_open', 'no');
   }
@@ -47,7 +47,6 @@ export class SettingsPage implements OnInit {
     this.db.dbState().subscribe((res) => {
       if (res) {
         this.db.getRoomDetail(this.device_uuid).then((res) => {
-          AppConfig.consoleLog('getRoomDetail', res);
           this.roomName = res['room_name'];
         });
       }
@@ -75,14 +74,11 @@ export class SettingsPage implements OnInit {
           text: 'Cancel',
           role: 'cancel',
           cssClass: 'secondary',
-          handler: () => {
-            AppConfig.consoleLog('Confirm Cancel');
-          },
+          handler: () => {},
         },
         {
           text: 'Ok',
           handler: async (data: any) => {
-            AppConfig.consoleLog('Saved Information', data.name);
             if (this.networkAvailable) {
               let loader = this.loadingCtrl.create({
                 cssClass: 'custom-loader',
@@ -92,7 +88,6 @@ export class SettingsPage implements OnInit {
 
               this.apiService.changeRoomName(data.name, this.room_id).then(
                 async (res: any) => {
-                  AppConfig.consoleLog(' success ', res);
                   if (res?.status == 'success') {
                     this.db.changeRoomName(data.name).then((res) => {
                       this.toast
@@ -107,7 +102,6 @@ export class SettingsPage implements OnInit {
                   (await loader).dismiss();
                 },
                 async (err) => {
-                  AppConfig.consoleLog(' error ', err);
                   (await loader).dismiss();
                 }
               );
@@ -141,48 +135,25 @@ export class SettingsPage implements OnInit {
   }
 
   networkSubscribe() {
-    // watch network for a disconnection
     this.network.onDisconnect().subscribe(() => {
-      AppConfig.consoleLog('network.onDisconnect event subscribed');
       this.networkAvailable = false;
     });
-    // watch network for a connection
     this.network.onConnect().subscribe(() => {
-      AppConfig.consoleLog('network.onConnect event subscribed');
       this.networkAvailable = true;
     });
   }
 
   networkUnsubscribe() {
-    // stop connect watch
     this.connectSubscription.unsubscribe();
-    AppConfig.consoleLog('network.onConnect event unsubscribed');
-    // stop disconnect watch
     this.disconnectSubscription.unsubscribe();
-    AppConfig.consoleLog('network.onDisconnect event unsubscribed');
-  }
-
-  ionViewWillEnter() {
-    AppConfig.consoleLog('ActivationPage ionViewWillEnter');
   }
 
   ionViewDidEnter() {
-    AppConfig.consoleLog('ActivationPage ionViewDidEnter');
     if (this.isConnected()) {
       this.networkAvailable = true;
-      AppConfig.consoleLog('Network available');
     } else {
       this.networkAvailable = false;
-      AppConfig.consoleLog('Network unavailable');
     }
     this.networkSubscribe();
-  }
-
-  ionViewWillLeave() {
-    AppConfig.consoleLog('ActivationPage ionViewWillLeave');
-  }
-
-  ionViewDidLeave() {
-    AppConfig.consoleLog('ActivationPage ionViewDidLeave');
   }
 }

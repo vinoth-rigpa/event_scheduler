@@ -13,12 +13,14 @@ import { DbService } from '../../../services/db/db.service';
 import { Subscription } from 'rxjs';
 import { Network } from '@ionic-native/network/ngx';
 import { ApiService } from '../../../services/api/api.service';
+
 @Component({
   selector: 'app-department-add',
   templateUrl: './department-add.page.html',
   styleUrls: ['./department-add.page.scss'],
 })
 export class DepartmentAddPage implements OnInit {
+  currentPage: string = 'Online DepartmentAddPage';
   mainForm: FormGroup;
   validation_messages = {
     dept_name: [{ type: 'required', message: 'Department name is required.' }],
@@ -30,7 +32,6 @@ export class DepartmentAddPage implements OnInit {
   disconnectSubscription: Subscription = new Subscription();
   networkAvailable: boolean = false;
   responseData: any;
-  device_uuid: any;
   constructor(
     public alertCtrl: AlertController,
     public loadingCtrl: LoadingController,
@@ -41,12 +42,10 @@ export class DepartmentAddPage implements OnInit {
     private router: Router,
     public formBuilder: FormBuilder,
     private toast: Toast
-  ) {
-    AppConfig.consoleLog('Online DepartmentPage constructor');
-    this.device_uuid = localStorage.getItem('device_uuid');
-  }
+  ) {}
 
   ngOnInit() {
+    AppConfig.consoleLog(this.currentPage + ' OnInit');
     this.mainForm = this.formBuilder.group({
       dept_name: new FormControl('', Validators.required),
       dept_password: new FormControl('', Validators.required),
@@ -57,7 +56,6 @@ export class DepartmentAddPage implements OnInit {
     this.db
       .checkDepartmentExists(this.mainForm.value.dept_name)
       .then(async (res) => {
-        AppConfig.consoleLog('endDateTime', res);
         if (res) {
           this.toast
             .show(`Department Name already exists.`, '2000', 'bottom')
@@ -79,7 +77,6 @@ export class DepartmentAddPage implements OnInit {
               ])
               .then(
                 async (res: any) => {
-                  AppConfig.consoleLog(' success ', res);
                   if (res?.status == 'success') {
                     this.db
                       .addDepartment(
@@ -96,7 +93,6 @@ export class DepartmentAddPage implements OnInit {
                   (await loader).dismiss();
                 },
                 async (err) => {
-                  AppConfig.consoleLog(' error ', err);
                   (await loader).dismiss();
                 }
               );
@@ -119,48 +115,25 @@ export class DepartmentAddPage implements OnInit {
   }
 
   networkSubscribe() {
-    // watch network for a disconnection
     this.network.onDisconnect().subscribe(() => {
-      AppConfig.consoleLog('network.onDisconnect event subscribed');
       this.networkAvailable = false;
     });
-    // watch network for a connection
     this.network.onConnect().subscribe(() => {
-      AppConfig.consoleLog('network.onConnect event subscribed');
       this.networkAvailable = true;
     });
   }
 
   networkUnsubscribe() {
-    // stop connect watch
     this.connectSubscription.unsubscribe();
-    AppConfig.consoleLog('network.onConnect event unsubscribed');
-    // stop disconnect watch
     this.disconnectSubscription.unsubscribe();
-    AppConfig.consoleLog('network.onDisconnect event unsubscribed');
-  }
-
-  ionViewWillEnter() {
-    AppConfig.consoleLog('ActivationPage ionViewWillEnter');
   }
 
   ionViewDidEnter() {
-    AppConfig.consoleLog('ActivationPage ionViewDidEnter');
     if (this.isConnected()) {
       this.networkAvailable = true;
-      AppConfig.consoleLog('Network available');
     } else {
       this.networkAvailable = false;
-      AppConfig.consoleLog('Network unavailable');
     }
     this.networkSubscribe();
-  }
-
-  ionViewWillLeave() {
-    AppConfig.consoleLog('ActivationPage ionViewWillLeave');
-  }
-
-  ionViewDidLeave() {
-    AppConfig.consoleLog('ActivationPage ionViewDidLeave');
   }
 }

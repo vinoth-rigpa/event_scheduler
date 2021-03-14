@@ -13,13 +13,14 @@ import { Event } from '../../../models/event';
 import { AppConfig } from '../../../config/appconfig';
 import { EventAddModalPage } from '../event-add-modal/event-add-modal.page';
 import { EventEditModalPage } from '../event-edit-modal/event-edit-modal.page';
-import * as moment from 'moment';
+
 @Component({
   selector: 'app-events-calendar',
   templateUrl: './events-calendar.page.html',
   styleUrls: ['./events-calendar.page.scss'],
 })
 export class EventsCalendarPage implements OnInit {
+  currentPage: string = 'Online EventsCalendarPage';
   device_uuid: any = '';
   device_password: any = '';
   eventsData: Event[] = [];
@@ -40,11 +41,12 @@ export class EventsCalendarPage implements OnInit {
     private modalCtrl: ModalController,
     private router: Router
   ) {
-    AppConfig.consoleLog('SettingsPage constructor');
     this.device_uuid = localStorage.getItem('device_uuid');
     this.device_password = localStorage.getItem('device_password');
   }
+
   ngOnInit() {
+    AppConfig.consoleLog(this.currentPage + ' OnInit');
     this.db.dbState().subscribe((res) => {
       if (res) {
         let currentDateTime = formatDate(
@@ -54,9 +56,7 @@ export class EventsCalendarPage implements OnInit {
         );
         this.db.getEvents(currentDateTime).then((item) => {
           this.eventsData = item;
-          AppConfig.consoleLog('eventData', this.eventsData);
           for (var i = 0; i < this.eventsData.length; i++) {
-            AppConfig.consoleLog('event', this.eventsData[i]);
             this.eventSource.push({
               title: this.eventsData[i].event_name,
               startTime: new Date(this.eventsData[i].start_datetime),
@@ -64,36 +64,37 @@ export class EventsCalendarPage implements OnInit {
               allDay: false,
             });
           }
-          AppConfig.consoleLog('this.eventSource', this.eventSource);
           this.myCal.loadEvents();
         });
       }
     });
   }
+
   next() {
     this.myCal.slideNext();
   }
+
   back() {
     this.myCal.slidePrev();
   }
+
   onViewTitleChanged(title) {
     this.viewTitle = title;
   }
+
   onTimeSelected(event) {
     if (this.showEventsList) {
-      AppConfig.consoleLog('onTimeSelect ', event);
       this.refreshEventListData(event.selectedTime);
     }
   }
+
   refreshEventListData(selectedTime) {
     this.selectedTime = formatDate(selectedTime, 'yyyy-MM-dd', this.locale);
-    AppConfig.consoleLog('selectedTime ', this.selectedTime);
     let currentDateTime = formatDate(
       new Date(),
       'yyyy-MM-dd HH:mm',
       this.locale
     );
-    AppConfig.consoleLog('currentDateTime ', currentDateTime);
     this.db.dbState().subscribe((res) => {
       if (res) {
         this.db
@@ -112,7 +113,6 @@ export class EventsCalendarPage implements OnInit {
                 this.locale
               );
             }
-            AppConfig.consoleLog('eventsList', this.eventsList);
             var eventsListDiv = document.getElementById('eventsList');
             if (this.eventsList.length > 0) {
               eventsListDiv.style.visibility = 'inherit';
@@ -127,20 +127,21 @@ export class EventsCalendarPage implements OnInit {
       }
     });
   }
+
   closeEvent() {
     var eventsListDiv = document.getElementById('eventsList');
     eventsListDiv.style.visibility = 'hidden';
     eventsListDiv.style.width = '0';
     eventsListDiv.style.height = '0';
   }
+
   ionViewDidEnter() {
-    AppConfig.consoleLog('EventsCalendarPage ionViewDidEnter');
     setTimeout(() => {
       this.showEventsList = true;
     }, 1000);
   }
+
   async deleteEventByID(event: Event) {
-    AppConfig.consoleLog('' + event.id);
     const alert = await this.alertCtrl.create({
       cssClass: 'admin-pwd-alert',
       message: 'Are you sure you want to delete?',
@@ -152,17 +153,11 @@ export class EventsCalendarPage implements OnInit {
           text: 'Cancel',
           role: 'cancel',
           cssClass: 'secondary',
-          handler: () => {
-            AppConfig.consoleLog('Confirm Cancel');
-          },
+          handler: () => {},
         },
         {
           text: 'Ok',
           handler: async (data: any) => {
-            AppConfig.consoleLog(
-              'Saved Information',
-              data.password + ' ' + event.dept_name + ' ' + this.device_password
-            );
             let loader = this.loadingCtrl.create({
               cssClass: 'custom-loader',
               spinner: 'lines-small',
@@ -173,7 +168,6 @@ export class EventsCalendarPage implements OnInit {
               .then(async (res) => {
                 (await loader).dismiss();
                 if (res) {
-                  AppConfig.consoleLog('dept_password ', res.dept_password);
                   this.db.deleteEvent(event.id).then(async (res) => {
                     this.eventSource = this.eventSource.filter(
                       (item) =>
@@ -217,6 +211,7 @@ export class EventsCalendarPage implements OnInit {
     });
     await alert.present();
   }
+
   async onEventSelected(event) {
     let start = formatDate(event.startTime, 'medium', this.locale);
     let end = formatDate(event.endTime, 'medium', this.locale);
@@ -228,6 +223,7 @@ export class EventsCalendarPage implements OnInit {
     });
     alert.present();
   }
+
   async openEventAddModal() {
     this.db.getDepartments().then(async (item) => {
       if (item.length > 0) {
@@ -258,10 +254,10 @@ export class EventsCalendarPage implements OnInit {
                 allDay: false,
               });
               this.db.addEvent(event).then((res) => {
-                AppConfig.consoleLog('event add ', res);
+                AppConfig.consoleLog('event added');
               });
               if (index === array.length - 1) {
-                AppConfig.consoleLog('event last one');
+                AppConfig.consoleLog('add event last index');
                 this.myCal.loadEvents();
               }
             });
@@ -274,8 +270,8 @@ export class EventsCalendarPage implements OnInit {
       }
     });
   }
+
   async openEventEditModal(event: Event) {
-    AppConfig.consoleLog('Event ID =>' + event.id);
     const alert = await this.alertCtrl.create({
       cssClass: 'admin-pwd-alert',
       message: 'Are you sure you want to edit?',
@@ -287,17 +283,11 @@ export class EventsCalendarPage implements OnInit {
           text: 'Cancel',
           role: 'cancel',
           cssClass: 'secondary',
-          handler: () => {
-            AppConfig.consoleLog('Confirm Cancel');
-          },
+          handler: () => {},
         },
         {
           text: 'Ok',
           handler: async (data: any) => {
-            AppConfig.consoleLog(
-              'Saved Information',
-              data.password + ' ' + event.dept_name + ' ' + this.device_password
-            );
             let loader = this.loadingCtrl.create({
               cssClass: 'custom-loader',
               spinner: 'lines-small',
@@ -308,7 +298,6 @@ export class EventsCalendarPage implements OnInit {
               .then(async (res) => {
                 (await loader).dismiss();
                 if (res) {
-                  AppConfig.consoleLog('dept_password ', res.dept_password);
                   const modal = await this.modalCtrl.create({
                     component: EventEditModalPage,
                     componentProps: { paramID: event.id },
@@ -336,7 +325,6 @@ export class EventsCalendarPage implements OnInit {
                       this.db
                         .updateEvent(result.data.event_id, event)
                         .then((res) => {
-                          AppConfig.consoleLog('this.res', res);
                           this.toast
                             .show(`Event details updated`, '2000', 'bottom')
                             .subscribe((_) => {});
@@ -373,7 +361,6 @@ export class EventsCalendarPage implements OnInit {
                         this.db
                           .updateEvent(result.data.event_id, event)
                           .then((res) => {
-                            AppConfig.consoleLog('this.res', res);
                             this.toast
                               .show(`Event details updated`, '2000', 'bottom')
                               .subscribe((_) => {});
@@ -394,6 +381,7 @@ export class EventsCalendarPage implements OnInit {
     });
     await alert.present();
   }
+
   goBack() {
     this.router.navigate([`online-dashboard`], { replaceUrl: true });
   }

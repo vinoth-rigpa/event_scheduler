@@ -20,6 +20,7 @@ import { ApiService } from '../../../services/api/api.service';
   styleUrls: ['./room-details.page.scss'],
 })
 export class RoomDetailsPage implements OnInit {
+  currentPage: string = 'Online RoomDetailsPage';
   connectSubscription: Subscription = new Subscription();
   disconnectSubscription: Subscription = new Subscription();
   networkAvailable: boolean = false;
@@ -35,6 +36,7 @@ export class RoomDetailsPage implements OnInit {
     network_url: [{ type: 'required', message: 'Server URL is required.' }],
   };
   pattern = '^[a-zA-Z0-9]+$';
+
   constructor(
     public alertCtrl: AlertController,
     public loadingCtrl: LoadingController,
@@ -46,11 +48,11 @@ export class RoomDetailsPage implements OnInit {
     private toast: Toast,
     public formBuilder: FormBuilder
   ) {
-    AppConfig.consoleLog('ChoosemodePage constructor');
     this.device_uuid = localStorage.getItem('device_uuid');
   }
 
   ngOnInit() {
+    AppConfig.consoleLog(this.currentPage + ' OnInit');
     this.room_details_form = this.formBuilder.group({
       room_id: new FormControl('', [
         Validators.required,
@@ -84,7 +86,6 @@ export class RoomDetailsPage implements OnInit {
 
       this.apiService.getTime(api_url).then(
         async (res: any) => {
-          AppConfig.consoleLog(' success ==> ', res);
           localStorage.setItem('api_url', api_url);
           this.apiService
             .registerDeviceConfig(
@@ -94,7 +95,6 @@ export class RoomDetailsPage implements OnInit {
             .then(
               async (res: any) => {
                 (await loader).dismiss();
-                AppConfig.consoleLog(' success ==> ', res);
                 this.db
                   .addRoomDetails(
                     this.device_uuid,
@@ -126,7 +126,6 @@ export class RoomDetailsPage implements OnInit {
                   });
               },
               async (err) => {
-                AppConfig.consoleLog(' error ==> ', err);
                 (await loader).dismiss();
                 this.toast
                   .show(`Server Unreachable. Try again Later`, '2000', 'bottom')
@@ -137,7 +136,6 @@ export class RoomDetailsPage implements OnInit {
             );
         },
         async (err) => {
-          AppConfig.consoleLog(' error ==> ', err);
           (await loader).dismiss();
           this.toast
             .show(`Server URL invalid`, '2000', 'bottom')
@@ -167,48 +165,25 @@ export class RoomDetailsPage implements OnInit {
   }
 
   networkSubscribe() {
-    // watch network for a disconnection
     this.network.onDisconnect().subscribe(() => {
-      AppConfig.consoleLog('network.onDisconnect event subscribed');
       this.networkAvailable = false;
     });
-    // watch network for a connection
     this.network.onConnect().subscribe(() => {
-      AppConfig.consoleLog('network.onConnect event subscribed');
       this.networkAvailable = true;
     });
   }
 
   networkUnsubscribe() {
-    // stop connect watch
     this.connectSubscription.unsubscribe();
-    AppConfig.consoleLog('network.onConnect event unsubscribed');
-    // stop disconnect watch
     this.disconnectSubscription.unsubscribe();
-    AppConfig.consoleLog('network.onDisconnect event unsubscribed');
-  }
-
-  ionViewWillEnter() {
-    AppConfig.consoleLog('ActivationPage ionViewWillEnter');
   }
 
   ionViewDidEnter() {
-    AppConfig.consoleLog('ActivationPage ionViewDidEnter');
     if (this.isConnected()) {
       this.networkAvailable = true;
-      AppConfig.consoleLog('Network available');
     } else {
       this.networkAvailable = false;
-      AppConfig.consoleLog('Network unavailable');
     }
     this.networkSubscribe();
-  }
-
-  ionViewWillLeave() {
-    AppConfig.consoleLog('ActivationPage ionViewWillLeave');
-  }
-
-  ionViewDidLeave() {
-    AppConfig.consoleLog('ActivationPage ionViewDidLeave');
   }
 }
