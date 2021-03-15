@@ -1,6 +1,7 @@
 import { CalendarComponent } from 'ionic2-calendar';
 import { Component, ViewChild, OnInit, Inject, LOCALE_ID } from '@angular/core';
 import {
+  Platform,
   AlertController,
   ModalController,
   LoadingController,
@@ -13,6 +14,9 @@ import { Event } from '../../../models/event';
 import { AppConfig } from '../../../config/appconfig';
 import { EventAddModalPage } from '../event-add-modal/event-add-modal.page';
 import { EventEditModalPage } from '../event-edit-modal/event-edit-modal.page';
+import { Subscription } from 'rxjs';
+import { Network } from '@ionic-native/network/ngx';
+import { ApiService } from '../../../services/api/api.service';
 
 @Component({
   selector: 'app-events-calendar',
@@ -23,6 +27,8 @@ export class EventsCalendarPage implements OnInit {
   currentPage: string = 'Online EventsCalendarPage';
   device_uuid: any = '';
   device_password: any = '';
+  roomName: string = '';
+  roomID: string = '';
   eventsData: Event[] = [];
   eventSource = [];
   viewTitle: string;
@@ -32,8 +38,15 @@ export class EventsCalendarPage implements OnInit {
   selectedTime: any;
   showEventsList: boolean = false;
   @ViewChild(CalendarComponent) myCal: CalendarComponent;
+  connectSubscription: Subscription = new Subscription();
+  disconnectSubscription: Subscription = new Subscription();
+  networkAvailable: boolean = false;
+  responseData: any;
   constructor(
+    public platform: Platform,
+    private apiService: ApiService,
     private db: DbService,
+    private network: Network,
     public loadingCtrl: LoadingController,
     private alertCtrl: AlertController,
     private toast: Toast,
@@ -43,6 +56,8 @@ export class EventsCalendarPage implements OnInit {
   ) {
     this.device_uuid = localStorage.getItem('device_uuid');
     this.device_password = localStorage.getItem('device_password');
+    this.roomID = localStorage.getItem('room_id');
+    this.roomName = localStorage.getItem('room_name');
   }
 
   ngOnInit() {
@@ -135,12 +150,6 @@ export class EventsCalendarPage implements OnInit {
     eventsListDiv.style.height = '0';
   }
 
-  ionViewDidEnter() {
-    setTimeout(() => {
-      this.showEventsList = true;
-    }, 1000);
-  }
-
   async deleteEventByID(event: Event) {
     const alert = await this.alertCtrl.create({
       cssClass: 'admin-pwd-alert',
@@ -168,36 +177,114 @@ export class EventsCalendarPage implements OnInit {
               .then(async (res) => {
                 (await loader).dismiss();
                 if (res) {
-                  this.db.deleteEvent(event.id).then(async (res) => {
-                    this.eventSource = this.eventSource.filter(
-                      (item) =>
-                        item.title !== event.event_name &&
-                        item.startTime !== new Date(event.start_datetime) &&
-                        item.endTime !== new Date(event.end_datetime)
-                    );
-                    this.eventsList = this.eventsList.filter(
-                      (item) => item.id !== event.id
-                    );
+                  if (this.networkAvailable) {
+                    let loader = this.loadingCtrl.create({
+                      cssClass: 'custom-loader',
+                      spinner: 'lines-small',
+                    });
+                    (await loader).present();
+
+                    this.apiService
+                      .updateEventTable('delete', this.roomName, this.roomID, [
+                        {
+                          eventID: event.event_id,
+                          eventName: event.event_name,
+                          department: event.dept_name,
+                          organizer: event.organizer,
+                          startDateTime: event.start_datetime,
+                          endDateTime: event.start_datetime,
+                          password: event.dept_password,
+                        },
+                      ])
+                      .then(
+                        async (res: any) => {
+                          if (res?.status == 'success') {
+                            this.db.deleteEvent(event.id).then(async (res) => {
+                              this.eventSource = this.eventSource.filter(
+                                (item) =>
+                                  item.title !== event.event_name &&
+                                  item.startTime !==
+                                    new Date(event.start_datetime) &&
+                                  item.endTime !== new Date(event.end_datetime)
+                              );
+                              this.eventsList = this.eventsList.filter(
+                                (item) => item.id !== event.id
+                              );
+                              this.toast
+                                .show(`Event deleted`, '2000', 'bottom')
+                                .subscribe((_) => {});
+                            });
+                          }
+                          (await loader).dismiss();
+                        },
+                        async (err) => {
+                          (await loader).dismiss();
+                        }
+                      );
+                  } else {
                     this.toast
-                      .show(`Event deleted`, '2000', 'bottom')
+                      .show(`No internet available`, '2000', 'bottom')
                       .subscribe((_) => {});
-                  });
+                  }
                 } else {
                   if (data.password == this.device_password) {
-                    this.db.deleteEvent(event.id).then(async (res) => {
-                      this.eventSource = this.eventSource.filter(
-                        (item) =>
-                          item.title !== event.event_name &&
-                          item.startTime !== new Date(event.start_datetime) &&
-                          item.endTime !== new Date(event.end_datetime)
-                      );
-                      this.eventsList = this.eventsList.filter(
-                        (item) => item.id !== event.id
-                      );
+                    if (this.networkAvailable) {
+                      let loader = this.loadingCtrl.create({
+                        cssClass: 'custom-loader',
+                        spinner: 'lines-small',
+                      });
+                      (await loader).present();
+
+                      this.apiService
+                        .updateEventTable(
+                          'delete',
+                          this.roomName,
+                          this.roomID,
+                          [
+                            {
+                              eventID: event.event_id,
+                              eventName: event.event_name,
+                              department: event.dept_name,
+                              organizer: event.organizer,
+                              startDateTime: event.start_datetime,
+                              endDateTime: event.start_datetime,
+                              password: event.dept_password,
+                            },
+                          ]
+                        )
+                        .then(
+                          async (res: any) => {
+                            if (res?.status == 'success') {
+                              this.db
+                                .deleteEvent(event.id)
+                                .then(async (res) => {
+                                  this.eventSource = this.eventSource.filter(
+                                    (item) =>
+                                      item.title !== event.event_name &&
+                                      item.startTime !==
+                                        new Date(event.start_datetime) &&
+                                      item.endTime !==
+                                        new Date(event.end_datetime)
+                                  );
+                                  this.eventsList = this.eventsList.filter(
+                                    (item) => item.id !== event.id
+                                  );
+                                  this.toast
+                                    .show(`Event deleted`, '2000', 'bottom')
+                                    .subscribe((_) => {});
+                                });
+                            }
+                            (await loader).dismiss();
+                          },
+                          async (err) => {
+                            (await loader).dismiss();
+                          }
+                        );
+                    } else {
                       this.toast
-                        .show(`Event deleted`, '2000', 'bottom')
+                        .show(`No internet available`, '2000', 'bottom')
                         .subscribe((_) => {});
-                    });
+                    }
                   } else {
                     this.toast
                       .show(AppConfig.INVALID_PASSWORD_MSG, '2000', 'bottom')
@@ -233,34 +320,90 @@ export class EventsCalendarPage implements OnInit {
           backdropDismiss: false,
         });
         await modal.present();
-        modal.onDidDismiss().then((result) => {
+        modal.onDidDismiss().then(async (result) => {
           if (result.data && result.data.event) {
             let eventData = result.data.event;
+            let eventInputArr = [];
             eventData.forEach((event, index, array) => {
-              event.start_datetime = formatDate(
-                event.start_datetime,
-                'yyyy-MM-dd HH:mm',
-                this.locale
-              );
-              event.end_datetime = formatDate(
-                event.end_datetime,
-                'yyyy-MM-dd HH:mm',
-                this.locale
-              );
-              this.eventSource.push({
-                title: event.event_name,
-                startTime: new Date(event.start_datetime),
-                endTime: new Date(event.end_datetime),
-                allDay: false,
-              });
-              this.db.addEvent(event).then((res) => {
-                AppConfig.consoleLog('event added');
-              });
-              if (index === array.length - 1) {
-                AppConfig.consoleLog('add event last index');
-                this.myCal.loadEvents();
-              }
+              event.start_datetime =
+                formatDate(
+                  event.start_datetime,
+                  'yyyy-MM-dd HH:mm',
+                  this.locale
+                ) + ':00';
+              event.end_datetime =
+                formatDate(
+                  event.end_datetime,
+                  'yyyy-MM-dd HH:mm',
+                  this.locale
+                ) + ':00';
+
+              let eventInputItem = {
+                eventID: event.event_id,
+                eventName: event.event_name,
+                department: event.dept_name,
+                organizer: event.organizer,
+                startDateTime: event.start_datetime,
+                endDateTime: event.end_datetime,
+                password: event.dept_password,
+              };
+
+              eventInputArr.push(eventInputItem);
             });
+
+            AppConfig.consoleLog('eventInputArr', eventInputArr);
+
+            if (this.networkAvailable) {
+              let loader = this.loadingCtrl.create({
+                cssClass: 'custom-loader',
+                spinner: 'lines-small',
+              });
+              (await loader).present();
+
+              this.apiService
+                .setEventTable(this.roomName, this.roomID, eventInputArr)
+                .then(
+                  async (res: any) => {
+                    if (res?.status == 'success') {
+                      eventData.forEach((event, index, array) => {
+                        event.start_datetime =
+                          formatDate(
+                            event.start_datetime,
+                            'yyyy-MM-dd HH:mm',
+                            this.locale
+                          ) + ':00';
+                        event.end_datetime =
+                          formatDate(
+                            event.end_datetime,
+                            'yyyy-MM-dd HH:mm',
+                            this.locale
+                          ) + ':00';
+                        this.eventSource.push({
+                          title: event.event_name,
+                          startTime: new Date(event.start_datetime),
+                          endTime: new Date(event.end_datetime),
+                          allDay: false,
+                        });
+                        this.db.addEvent(event).then((res) => {
+                          AppConfig.consoleLog('new event added');
+                        });
+                        if (index === array.length - 1) {
+                          AppConfig.consoleLog('add event - last index');
+                          this.myCal.loadEvents();
+                        }
+                      });
+                    }
+                    (await loader).dismiss();
+                  },
+                  async (err) => {
+                    (await loader).dismiss();
+                  }
+                );
+            } else {
+              this.toast
+                .show(`No internet available`, '2000', 'bottom')
+                .subscribe((_) => {});
+            }
           }
         });
       } else {
@@ -312,16 +455,18 @@ export class EventsCalendarPage implements OnInit {
                       result.data.event
                     ) {
                       let event = result.data.event;
-                      event.start_datetime = formatDate(
-                        event.start_datetime,
-                        'yyyy-MM-dd HH:mm',
-                        this.locale
-                      );
-                      event.end_datetime = formatDate(
-                        event.end_datetime,
-                        'yyyy-MM-dd HH:mm',
-                        this.locale
-                      );
+                      event.start_datetime =
+                        formatDate(
+                          event.start_datetime,
+                          'yyyy-MM-dd HH:mm',
+                          this.locale
+                        ) + ':00';
+                      event.end_datetime =
+                        formatDate(
+                          event.end_datetime,
+                          'yyyy-MM-dd HH:mm',
+                          this.locale
+                        ) + ':00';
                       this.db
                         .updateEvent(result.data.event_id, event)
                         .then((res) => {
@@ -348,16 +493,18 @@ export class EventsCalendarPage implements OnInit {
                         result.data.event
                       ) {
                         let event = result.data.event;
-                        event.start_datetime = formatDate(
-                          event.start_datetime,
-                          'yyyy-MM-dd HH:mm',
-                          this.locale
-                        );
-                        event.end_datetime = formatDate(
-                          event.end_datetime,
-                          'yyyy-MM-dd HH:mm',
-                          this.locale
-                        );
+                        event.start_datetime =
+                          formatDate(
+                            event.start_datetime,
+                            'yyyy-MM-dd HH:mm',
+                            this.locale
+                          ) + ':00';
+                        event.end_datetime =
+                          formatDate(
+                            event.end_datetime,
+                            'yyyy-MM-dd HH:mm',
+                            this.locale
+                          ) + ':00';
                         this.db
                           .updateEvent(result.data.event_id, event)
                           .then((res) => {
@@ -384,5 +531,36 @@ export class EventsCalendarPage implements OnInit {
 
   goBack() {
     this.router.navigate([`online-dashboard`], { replaceUrl: true });
+  }
+
+  isConnected(): boolean {
+    let conntype = this.network.type;
+    return conntype && conntype !== 'unknown' && conntype !== 'none';
+  }
+
+  networkSubscribe() {
+    this.network.onDisconnect().subscribe(() => {
+      this.networkAvailable = false;
+    });
+    this.network.onConnect().subscribe(() => {
+      this.networkAvailable = true;
+    });
+  }
+
+  networkUnsubscribe() {
+    this.connectSubscription.unsubscribe();
+    this.disconnectSubscription.unsubscribe();
+  }
+
+  ionViewDidEnter() {
+    if (this.isConnected()) {
+      this.networkAvailable = true;
+    } else {
+      this.networkAvailable = false;
+    }
+    this.networkSubscribe();
+    setTimeout(() => {
+      this.showEventsList = true;
+    }, 1000);
   }
 }

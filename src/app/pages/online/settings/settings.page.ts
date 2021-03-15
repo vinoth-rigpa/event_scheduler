@@ -36,6 +36,7 @@ export class SettingsPage implements OnInit {
   ) {
     this.device_uuid = localStorage.getItem('device_uuid');
     this.room_id = localStorage.getItem('room_id');
+    this.roomName = localStorage.getItem('room_name');
     this.device_password = localStorage.getItem('device_password');
     let device_timeout = localStorage.getItem('device_timeout');
     let timeoutSecs: number = +device_timeout;
@@ -44,13 +45,7 @@ export class SettingsPage implements OnInit {
   }
 
   ngOnInit() {
-    this.db.dbState().subscribe((res) => {
-      if (res) {
-        this.db.getRoomDetail(this.device_uuid).then((res) => {
-          this.roomName = res['room_name'];
-        });
-      }
-    });
+    AppConfig.consoleLog(this.currentPage + ' OnInit');
   }
 
   goPage(pmPage) {

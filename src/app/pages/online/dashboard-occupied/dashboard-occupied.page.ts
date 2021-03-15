@@ -4,6 +4,7 @@ import { formatDate } from '@angular/common';
 import { AppConfig } from '../../../config/appconfig';
 import { DbService } from '../../../services/db/db.service';
 import {
+  Platform,
   AlertController,
   ModalController,
   LoadingController,
@@ -16,6 +17,9 @@ import { EventListModalPage } from '../event-list-modal/event-list-modal.page';
 import { EventBookModalPage } from '../event-book-modal/event-book-modal.page';
 import { EventExtendModalPage } from '../event-extend-modal/event-extend-modal.page';
 import * as moment from 'moment';
+import { Subscription } from 'rxjs';
+import { Network } from '@ionic-native/network/ngx';
+import { ApiService } from '../../../services/api/api.service';
 
 @Component({
   selector: 'app-dashboard-occupied',
@@ -27,6 +31,7 @@ export class DashboardOccupiedPage implements OnInit {
   device_uuid: any = '';
   device_password: any = '';
   roomName: string = '';
+  roomID: string = '';
   today = new Date().toLocaleTimeString();
   todayTime = '';
   todayTimeTxt = '';
@@ -39,6 +44,11 @@ export class DashboardOccupiedPage implements OnInit {
   intervalRefreshData: any;
   sliderTitle: any = '';
   @ViewChild('slides', { static: true }) slides: IonSlides;
+  connectSubscription: Subscription = new Subscription();
+  disconnectSubscription: Subscription = new Subscription();
+  networkAvailable: boolean = false;
+  responseData: any;
+
   constructor(
     public alertController: AlertController,
     private modalCtrl: ModalController,
@@ -46,10 +56,15 @@ export class DashboardOccupiedPage implements OnInit {
     @Inject(LOCALE_ID) private locale: string,
     private db: DbService,
     private router: Router,
-    private toast: Toast
+    private toast: Toast,
+    public platform: Platform,
+    private network: Network,
+    private apiService: ApiService
   ) {
     this.device_uuid = localStorage.getItem('device_uuid');
     this.device_password = localStorage.getItem('device_password');
+    this.roomID = localStorage.getItem('room_id');
+    this.roomName = localStorage.getItem('room_name');
     this.startTime();
     this.todayDate = formatDate(new Date(), 'MMM d, yyyy', this.locale);
     this.todayDateTxt = formatDate(new Date(), 'MMM d', this.locale);
@@ -59,9 +74,6 @@ export class DashboardOccupiedPage implements OnInit {
     AppConfig.consoleLog(this.currentPage + ' OnInit');
     this.db.dbState().subscribe((res) => {
       if (res) {
-        this.db.getRoomDetail(this.device_uuid).then((res) => {
-          this.roomName = this.truncate(res['room_name']);
-        });
         let currentDateTime = formatDate(
           new Date(),
           'yyyy-MM-dd HH:mm',
@@ -93,6 +105,76 @@ export class DashboardOccupiedPage implements OnInit {
             this.event_status = 'AVAILABLE';
             this.uiChanges(currentDateTime);
           }
+
+          this.apiService.getEventTable(this.roomName, this.roomID).then(
+            async (res2: any) => {
+              if (res2?.schedule && res2.schedule.length > 0) {
+                for (let i = 0; i < res2.schedule.length; i++) {
+                  this.db
+                    .checkEventExistsByID(res2.schedule[i].eventID)
+                    .then(async (res3) => {
+                      let eventInputItem = {
+                        id: i,
+                        event_id: res2.schedule[i].eventID,
+                        event_name: res2.schedule[i].eventName,
+                        dept_name: res2.schedule[i].department,
+                        organizer: res2.schedule[i].organizer,
+                        start_datetime:
+                          formatDate(
+                            res2.schedule[i].startDateTime,
+                            'yyyy-MM-dd HH:mm',
+                            this.locale
+                          ) + ':00',
+                        end_datetime:
+                          formatDate(
+                            res2.schedule[i].endDateTime,
+                            'yyyy-MM-dd HH:mm',
+                            this.locale
+                          ) + ':00',
+                        dept_password: res2.schedule[i].password,
+                        event_status: 0,
+                        sync_status: 1,
+                      };
+                      if (res3) {
+                        this.db
+                          .updateEvent(res2.schedule[i].eventID, eventInputItem)
+                          .then((res4) => {
+                            AppConfig.consoleLog('updateEvent', res4);
+                          });
+                      } else {
+                        this.db.addEvent(eventInputItem).then((res4) => {
+                          AppConfig.consoleLog('addEvent', res4);
+                        });
+                      }
+                    });
+                }
+              }
+            },
+            async (err) => {}
+          );
+
+          this.apiService.getDeptList().then(
+            async (res: any) => {
+              if (res?.departmentList && res.departmentList.length > 0) {
+                for (let i = 0; i < res.departmentList.length; i++) {
+                  this.db
+                    .checkDepartmentExists(res.departmentList[i].department)
+                    .then(async (res1) => {
+                      if (res1) {
+                      } else {
+                        this.db
+                          .addDepartment(
+                            res.departmentList[i].department,
+                            res.departmentList[i].password
+                          )
+                          .then((res2) => {});
+                      }
+                    });
+                }
+              }
+            },
+            async (err) => {}
+          );
         });
       }
     });
@@ -404,26 +486,6 @@ export class DashboardOccupiedPage implements OnInit {
     this.getUpcomingEventsByDate(currentDateTime);
   }
 
-  ionViewDidEnter() {
-    setTimeout(() => {
-      let currentDateTime = formatDate(
-        new Date(),
-        'yyyy-MM-dd HH:mm',
-        this.locale
-      );
-      this.uiChanges(currentDateTime);
-    }, 300);
-    this.intervalRefreshData = setInterval(() => {
-      AppConfig.consoleLog('5 secs interval');
-      this.refreshData();
-    }, 5000);
-  }
-
-  ionViewWillLeave() {
-    clearInterval(this.intervalTimer);
-    clearInterval(this.intervalRefreshData);
-  }
-
   async checkinEvent() {
     const alert = await this.alertController.create({
       cssClass: 'admin-pwd-alert',
@@ -668,24 +730,78 @@ export class DashboardOccupiedPage implements OnInit {
             backdropDismiss: false,
           });
           await modal.present();
-          modal.onDidDismiss().then((result) => {
+          modal.onDidDismiss().then(async (result) => {
             if (result.data && result.data.event) {
               let event = result.data.event;
-              event.start_datetime = formatDate(
-                event.start_datetime,
-                'yyyy-MM-dd HH:mm',
-                this.locale
-              );
-              event.end_datetime = formatDate(
-                event.end_datetime,
-                'yyyy-MM-dd HH:mm',
-                this.locale
-              );
-              this.db.bookEvent(event).then((res) => {
-                this.router.navigate([`online-dashboard`], {
-                  replaceUrl: true,
+
+              let eventInputArr = [];
+              event.start_datetime =
+                formatDate(
+                  event.start_datetime,
+                  'yyyy-MM-dd HH:mm',
+                  this.locale
+                ) + ':00';
+              event.end_datetime =
+                formatDate(
+                  event.end_datetime,
+                  'yyyy-MM-dd HH:mm',
+                  this.locale
+                ) + ':00';
+
+              let eventInputItem = {
+                eventID: event.event_id,
+                eventName: event.event_name,
+                department: event.dept_name,
+                organizer: event.organizer,
+                startDateTime: event.start_datetime,
+                endDateTime: event.end_datetime,
+                password: event.dept_password,
+              };
+
+              eventInputArr.push(eventInputItem);
+              AppConfig.consoleLog('eventInputArr', eventInputArr);
+
+              if (this.networkAvailable) {
+                let loader = this.loadingCtrl.create({
+                  cssClass: 'custom-loader',
+                  spinner: 'lines-small',
                 });
-              });
+                (await loader).present();
+
+                this.apiService
+                  .setEventTable(this.roomName, this.roomID, eventInputArr)
+                  .then(
+                    async (res: any) => {
+                      if (res?.status == 'success') {
+                        event.start_datetime =
+                          formatDate(
+                            event.start_datetime,
+                            'yyyy-MM-dd HH:mm',
+                            this.locale
+                          ) + ':00';
+                        event.end_datetime =
+                          formatDate(
+                            event.end_datetime,
+                            'yyyy-MM-dd HH:mm',
+                            this.locale
+                          ) + ':00';
+                        this.db.bookEvent(event).then((res) => {
+                          this.router.navigate([`online-dashboard`], {
+                            replaceUrl: true,
+                          });
+                        });
+                      }
+                      (await loader).dismiss();
+                    },
+                    async (err) => {
+                      (await loader).dismiss();
+                    }
+                  );
+              } else {
+                this.toast
+                  .show(`No internet available`, '2000', 'bottom')
+                  .subscribe((_) => {});
+              }
             }
           });
         } else {
@@ -710,30 +826,86 @@ export class DashboardOccupiedPage implements OnInit {
           backdropDismiss: false,
         });
         await modal.present();
-        modal.onDidDismiss().then((result) => {
+        modal.onDidDismiss().then(async (result) => {
           if (result.data && result.data.event) {
             let eventData = result.data.event;
+            let eventInputArr = [];
             eventData.forEach((event, index, array) => {
-              event.start_datetime = formatDate(
-                event.start_datetime,
-                'yyyy-MM-dd HH:mm',
-                this.locale
-              );
-              event.end_datetime = formatDate(
-                event.end_datetime,
-                'yyyy-MM-dd HH:mm',
-                this.locale
-              );
-              this.db.addEvent(event).then((res) => {
-                AppConfig.consoleLog('new event added');
-              });
-              if (index === array.length - 1) {
-                AppConfig.consoleLog('add event - last index');
-                this.router.navigate([`online-dashboard`], {
-                  replaceUrl: true,
-                });
-              }
+              event.start_datetime =
+                formatDate(
+                  event.start_datetime,
+                  'yyyy-MM-dd HH:mm',
+                  this.locale
+                ) + ':00';
+              event.end_datetime =
+                formatDate(
+                  event.end_datetime,
+                  'yyyy-MM-dd HH:mm',
+                  this.locale
+                ) + ':00';
+
+              let eventInputItem = {
+                eventID: event.event_id,
+                eventName: event.event_name,
+                department: event.dept_name,
+                organizer: event.organizer,
+                startDateTime: event.start_datetime,
+                endDateTime: event.end_datetime,
+                password: event.dept_password,
+              };
+
+              eventInputArr.push(eventInputItem);
             });
+
+            AppConfig.consoleLog('eventInputArr', eventInputArr);
+
+            if (this.networkAvailable) {
+              let loader = this.loadingCtrl.create({
+                cssClass: 'custom-loader',
+                spinner: 'lines-small',
+              });
+              (await loader).present();
+
+              this.apiService
+                .setEventTable(this.roomName, this.roomID, eventInputArr)
+                .then(
+                  async (res: any) => {
+                    if (res?.status == 'success') {
+                      eventData.forEach((event, index, array) => {
+                        event.start_datetime =
+                          formatDate(
+                            event.start_datetime,
+                            'yyyy-MM-dd HH:mm',
+                            this.locale
+                          ) + ':00';
+                        event.end_datetime =
+                          formatDate(
+                            event.end_datetime,
+                            'yyyy-MM-dd HH:mm',
+                            this.locale
+                          ) + ':00';
+                        this.db.addEvent(event).then((res) => {
+                          AppConfig.consoleLog('new event added');
+                        });
+                        if (index === array.length - 1) {
+                          AppConfig.consoleLog('add event - last index');
+                          this.router.navigate([`online-dashboard`], {
+                            replaceUrl: true,
+                          });
+                        }
+                      });
+                    }
+                    (await loader).dismiss();
+                  },
+                  async (err) => {
+                    (await loader).dismiss();
+                  }
+                );
+            } else {
+              this.toast
+                .show(`No internet available`, '2000', 'bottom')
+                .subscribe((_) => {});
+            }
           }
         });
       } else {
@@ -793,5 +965,50 @@ export class DashboardOccupiedPage implements OnInit {
       ],
     });
     await alert.present();
+  }
+
+  isConnected(): boolean {
+    let conntype = this.network.type;
+    return conntype && conntype !== 'unknown' && conntype !== 'none';
+  }
+
+  networkSubscribe() {
+    this.network.onDisconnect().subscribe(() => {
+      this.networkAvailable = false;
+    });
+    this.network.onConnect().subscribe(() => {
+      this.networkAvailable = true;
+    });
+  }
+
+  networkUnsubscribe() {
+    this.connectSubscription.unsubscribe();
+    this.disconnectSubscription.unsubscribe();
+  }
+
+  ionViewDidEnter() {
+    if (this.isConnected()) {
+      this.networkAvailable = true;
+    } else {
+      this.networkAvailable = false;
+    }
+    this.networkSubscribe();
+    setTimeout(() => {
+      let currentDateTime = formatDate(
+        new Date(),
+        'yyyy-MM-dd HH:mm',
+        this.locale
+      );
+      this.uiChanges(currentDateTime);
+    }, 300);
+    this.intervalRefreshData = setInterval(() => {
+      AppConfig.consoleLog('5 secs interval');
+      this.refreshData();
+    }, 5000);
+  }
+
+  ionViewWillLeave() {
+    clearInterval(this.intervalTimer);
+    clearInterval(this.intervalRefreshData);
   }
 }

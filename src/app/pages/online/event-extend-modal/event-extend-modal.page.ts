@@ -1,15 +1,18 @@
 import { Component, AfterViewInit, Inject, LOCALE_ID } from '@angular/core';
 import { formatDate } from '@angular/common';
 import {
+  Platform,
   ModalController,
   LoadingController,
-  AlertController,
   NavParams,
 } from '@ionic/angular';
 import { Toast } from '@ionic-native/toast/ngx';
 import { DbService } from '../../../services/db/db.service';
 import { AppConfig } from '../../../config/appconfig';
 import * as moment from 'moment';
+import { Subscription } from 'rxjs';
+import { Network } from '@ionic-native/network/ngx';
+import { ApiService } from '../../../services/api/api.service';
 
 @Component({
   selector: 'app-event-extend-modal',
@@ -20,6 +23,8 @@ export class EventExtendModalPage implements AfterViewInit {
   currentPage: string = 'Online EventExtendModalPage';
   device_uuid: any = '';
   device_password: any = '';
+  roomName: string = '';
+  roomID: string = '';
   modalReady = false;
   percent: any = 0;
   radius: any = 100;
@@ -30,9 +35,16 @@ export class EventExtendModalPage implements AfterViewInit {
   nextEventData: any;
   currentEventStartTime: any;
   currentEventEndTime: any;
+  connectSubscription: Subscription = new Subscription();
+  disconnectSubscription: Subscription = new Subscription();
+  networkAvailable: boolean = false;
+  responseData: any;
 
   constructor(
+    public platform: Platform,
+    private apiService: ApiService,
     private db: DbService,
+    private network: Network,
     public loadingCtrl: LoadingController,
     @Inject(LOCALE_ID) private locale: string,
     private toast: Toast,
@@ -41,6 +53,8 @@ export class EventExtendModalPage implements AfterViewInit {
   ) {
     this.device_uuid = localStorage.getItem('device_uuid');
     this.device_password = localStorage.getItem('device_password');
+    this.roomID = localStorage.getItem('room_id');
+    this.roomName = localStorage.getItem('room_name');
   }
 
   ngOnInit() {
@@ -117,18 +131,57 @@ export class EventExtendModalPage implements AfterViewInit {
             .show(`Can't extend beyond next event start time`, '2000', 'bottom')
             .subscribe((_) => {});
         } else {
-          this.db
-            .extendEventStatus(this.currentEventData?.id, endDateTime)
-            .then((res) => {
-              this.toast
-                .show(
-                  `Event extended for another ` + this.percent + ` minitues`,
-                  '3000',
-                  'bottom'
-                )
-                .subscribe((_) => {});
-              this.modalCtrl.dismiss({ event: res });
+          if (this.networkAvailable) {
+            let loader = this.loadingCtrl.create({
+              cssClass: 'custom-loader',
+              spinner: 'lines-small',
             });
+            (await loader).present();
+
+            this.apiService
+              .updateEventTable('extend', this.roomName, this.roomID, [
+                {
+                  eventID: this.currentEventData?.event_id,
+                  eventName: this.currentEventData?.event_name,
+                  department: this.currentEventData?.dept_name,
+                  organizer: this.currentEventData?.organizer,
+                  startDateTime: this.currentEventData?.start_datetime,
+                  endDateTime: endDateTime + ':00',
+                  password: this.currentEventData?.dept_password,
+                },
+              ])
+              .then(
+                async (res: any) => {
+                  if (res?.status == 'success') {
+                    this.db
+                      .extendEventStatus(
+                        this.currentEventData?.id,
+                        endDateTime + ':00'
+                      )
+                      .then((res) => {
+                        this.toast
+                          .show(
+                            `Event extended for another ` +
+                              this.percent +
+                              ` minitues`,
+                            '3000',
+                            'bottom'
+                          )
+                          .subscribe((_) => {});
+                        this.modalCtrl.dismiss({ event: res });
+                      });
+                  }
+                  (await loader).dismiss();
+                },
+                async (err) => {
+                  (await loader).dismiss();
+                }
+              );
+          } else {
+            this.toast
+              .show(`No internet available`, '2000', 'bottom')
+              .subscribe((_) => {});
+          }
         }
       } else {
         let currEndDateTime = formatDate(
@@ -149,18 +202,57 @@ export class EventExtendModalPage implements AfterViewInit {
           'MMM d, h:mm a',
           this.locale
         );
-        this.db
-          .extendEventStatus(this.currentEventData?.id, endDateTime)
-          .then((res) => {
-            this.toast
-              .show(
-                `Event extended for another ` + this.percent + ` minitues`,
-                '3000',
-                'bottom'
-              )
-              .subscribe((_) => {});
-            this.modalCtrl.dismiss({ event: res });
+        if (this.networkAvailable) {
+          let loader = this.loadingCtrl.create({
+            cssClass: 'custom-loader',
+            spinner: 'lines-small',
           });
+          (await loader).present();
+
+          this.apiService
+            .updateEventTable('extend', this.roomName, this.roomID, [
+              {
+                eventID: this.currentEventData?.event_id,
+                eventName: this.currentEventData?.event_name,
+                department: this.currentEventData?.dept_name,
+                organizer: this.currentEventData?.organizer,
+                startDateTime: this.currentEventData?.start_datetime,
+                endDateTime: endDateTime + ':00',
+                password: this.currentEventData?.dept_password,
+              },
+            ])
+            .then(
+              async (res: any) => {
+                if (res?.status == 'success') {
+                  this.db
+                    .extendEventStatus(
+                      this.currentEventData?.id,
+                      endDateTime + ':00'
+                    )
+                    .then((res) => {
+                      this.toast
+                        .show(
+                          `Event extended for another ` +
+                            this.percent +
+                            ` minitues`,
+                          '3000',
+                          'bottom'
+                        )
+                        .subscribe((_) => {});
+                      this.modalCtrl.dismiss({ event: res });
+                    });
+                }
+                (await loader).dismiss();
+              },
+              async (err) => {
+                (await loader).dismiss();
+              }
+            );
+        } else {
+          this.toast
+            .show(`No internet available`, '2000', 'bottom')
+            .subscribe((_) => {});
+        }
       }
     }
   }
@@ -207,5 +299,33 @@ export class EventExtendModalPage implements AfterViewInit {
 
   close() {
     this.modalCtrl.dismiss();
+  }
+
+  isConnected(): boolean {
+    let conntype = this.network.type;
+    return conntype && conntype !== 'unknown' && conntype !== 'none';
+  }
+
+  networkSubscribe() {
+    this.network.onDisconnect().subscribe(() => {
+      this.networkAvailable = false;
+    });
+    this.network.onConnect().subscribe(() => {
+      this.networkAvailable = true;
+    });
+  }
+
+  networkUnsubscribe() {
+    this.connectSubscription.unsubscribe();
+    this.disconnectSubscription.unsubscribe();
+  }
+
+  ionViewDidEnter() {
+    if (this.isConnected()) {
+      this.networkAvailable = true;
+    } else {
+      this.networkAvailable = false;
+    }
+    this.networkSubscribe();
   }
 }

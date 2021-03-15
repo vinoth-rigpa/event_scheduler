@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-
 import { AutocloseOverlaysService } from './autoclose-overlays.service';
 
 describe('AutocloseOverlaysService', () => {

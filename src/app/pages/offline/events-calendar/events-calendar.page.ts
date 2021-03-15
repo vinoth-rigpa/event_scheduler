@@ -237,16 +237,18 @@ export class EventsCalendarPage implements OnInit {
           if (result.data && result.data.event) {
             let eventData = result.data.event;
             eventData.forEach((event, index, array) => {
-              event.start_datetime = formatDate(
-                event.start_datetime,
-                'yyyy-MM-dd HH:mm',
-                this.locale
-              );
-              event.end_datetime = formatDate(
-                event.end_datetime,
-                'yyyy-MM-dd HH:mm',
-                this.locale
-              );
+              event.start_datetime =
+                formatDate(
+                  event.start_datetime,
+                  'yyyy-MM-dd HH:mm',
+                  this.locale
+                ) + ':00';
+              event.end_datetime =
+                formatDate(
+                  event.end_datetime,
+                  'yyyy-MM-dd HH:mm',
+                  this.locale
+                ) + ':00';
               this.eventSource.push({
                 title: event.event_name,
                 startTime: new Date(event.start_datetime),
@@ -312,16 +314,18 @@ export class EventsCalendarPage implements OnInit {
                       result.data.event
                     ) {
                       let event = result.data.event;
-                      event.start_datetime = formatDate(
-                        event.start_datetime,
-                        'yyyy-MM-dd HH:mm',
-                        this.locale
-                      );
-                      event.end_datetime = formatDate(
-                        event.end_datetime,
-                        'yyyy-MM-dd HH:mm',
-                        this.locale
-                      );
+                      event.start_datetime =
+                        formatDate(
+                          event.start_datetime,
+                          'yyyy-MM-dd HH:mm',
+                          this.locale
+                        ) + ':00';
+                      event.end_datetime =
+                        formatDate(
+                          event.end_datetime,
+                          'yyyy-MM-dd HH:mm',
+                          this.locale
+                        ) + ':00';
                       this.db
                         .updateEvent(result.data.event_id, event)
                         .then((res) => {
@@ -348,16 +352,18 @@ export class EventsCalendarPage implements OnInit {
                         result.data.event
                       ) {
                         let event = result.data.event;
-                        event.start_datetime = formatDate(
-                          event.start_datetime,
-                          'yyyy-MM-dd HH:mm',
-                          this.locale
-                        );
-                        event.end_datetime = formatDate(
-                          event.end_datetime,
-                          'yyyy-MM-dd HH:mm',
-                          this.locale
-                        );
+                        event.start_datetime =
+                          formatDate(
+                            event.start_datetime,
+                            'yyyy-MM-dd HH:mm',
+                            this.locale
+                          ) + ':00';
+                        event.end_datetime =
+                          formatDate(
+                            event.end_datetime,
+                            'yyyy-MM-dd HH:mm',
+                            this.locale
+                          ) + ':00';
                         this.db
                           .updateEvent(result.data.event_id, event)
                           .then((res) => {

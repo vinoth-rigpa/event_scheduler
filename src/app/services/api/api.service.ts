@@ -58,6 +58,7 @@ export class ApiService {
 
   get(path, baseUrl: String = '') {
     return new Promise((resolve, reject) => {
+      this.http.setRequestTimeout(30.0);
       this.apiUrl = localStorage.getItem('api_url') + AppConfig.API_BASE_URL;
       let apiURL = this.apiUrl + path;
       if (baseUrl != '') {
@@ -87,6 +88,7 @@ export class ApiService {
   post(inputdata, path, authtoken = '') {
     return new Promise((resolve, reject) => {
       this.http.setDataSerializer('json');
+      this.http.setRequestTimeout(30.0);
       this.apiUrl = localStorage.getItem('api_url') + AppConfig.API_BASE_URL;
       AppConfig.consoleLog('API_URL-->', this.apiUrl + path);
       AppConfig.consoleLog('API_INPUT_DATA-->', JSON.stringify(inputdata));

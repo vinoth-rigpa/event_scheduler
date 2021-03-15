@@ -231,6 +231,29 @@ export class DbService {
   }
 
   // Get list
+  getAllEvents() {
+    return this.storage.executeSql('SELECT * FROM events', []).then((res) => {
+      let items: Event[] = [];
+      if (res.rows.length > 0) {
+        for (var i = 0; i < res.rows.length; i++) {
+          items.push({
+            id: res.rows.item(i).id,
+            event_id: res.rows.item(i).event_id,
+            event_name: res.rows.item(i).event_name,
+            dept_name: res.rows.item(i).dept_name,
+            organizer: res.rows.item(i).organizer,
+            start_datetime: res.rows.item(i).start_datetime,
+            end_datetime: res.rows.item(i).end_datetime,
+            dept_password: res.rows.item(i).dept_password,
+            event_status: res.rows.item(i).event_status,
+            sync_status: res.rows.item(i).sync_status,
+          });
+        }
+      }
+      return items;
+    });
+  }
+
   getEvents(pmDate) {
     return this.storage
       .executeSql(
@@ -487,6 +510,27 @@ export class DbService {
       });
   }
 
+  checkEventExistsByID(eventId): Promise<Event> {
+    return this.storage
+      .executeSql('SELECT * FROM events WHERE event_id = ?', [eventId])
+      .then((res) => {
+        if (res.rows.length > 0) {
+          return {
+            id: res.rows.item(0).id,
+            event_id: res.rows.item(0).event_id,
+            event_name: res.rows.item(0).event_name,
+            dept_name: res.rows.item(0).dept_name,
+            organizer: res.rows.item(0).organizer,
+            start_datetime: res.rows.item(0).start_datetime,
+            end_datetime: res.rows.item(0).end_datetime,
+            dept_password: res.rows.item(0).dept_password,
+            event_status: res.rows.item(0).event_status,
+            sync_status: res.rows.item(0).sync_status,
+          };
+        }
+      });
+  }
+
   checkEventExistsonEdit(
     eventId,
     pmStartDatetime,
@@ -547,11 +591,11 @@ export class DbService {
       });
   }
 
-  getUpcomingEventsByDate(pmDate) {
+  getUpcomingEventsByDate(pmDate, limit = 10) {
     return this.storage
       .executeSql(
-        "SELECT * FROM events WHERE event_status != 2 AND (strftime('%s', start_datetime) > strftime('%s', ?) OR (strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime))) ORDER BY strftime('%s', start_datetime) ASC",
-        [pmDate, pmDate]
+        "SELECT * FROM events WHERE event_status != 2 AND (strftime('%s', start_datetime) > strftime('%s', ?) OR (strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime))) ORDER BY strftime('%s', start_datetime) ASC LIMIT ?",
+        [pmDate, pmDate, limit]
       )
       .then((res) => {
         let items: Event[] = [];

@@ -16,6 +16,7 @@ import { EventListModalPage } from '../event-list-modal/event-list-modal.page';
 import { EventBookModalPage } from '../event-book-modal/event-book-modal.page';
 import { EventExtendModalPage } from '../event-extend-modal/event-extend-modal.page';
 import * as moment from 'moment';
+
 @Component({
   selector: 'app-dashboard-pending',
   templateUrl: './dashboard-pending.page.html',
@@ -670,16 +671,18 @@ export class DashboardPendingPage implements OnInit {
           modal.onDidDismiss().then((result) => {
             if (result.data && result.data.event) {
               let event = result.data.event;
-              event.start_datetime = formatDate(
-                event.start_datetime,
-                'yyyy-MM-dd HH:mm',
-                this.locale
-              );
-              event.end_datetime = formatDate(
-                event.end_datetime,
-                'yyyy-MM-dd HH:mm',
-                this.locale
-              );
+              event.start_datetime =
+                formatDate(
+                  event.start_datetime,
+                  'yyyy-MM-dd HH:mm',
+                  this.locale
+                ) + ':00';
+              event.end_datetime =
+                formatDate(
+                  event.end_datetime,
+                  'yyyy-MM-dd HH:mm',
+                  this.locale
+                ) + ':00';
               this.db.bookEvent(event).then((res) => {
                 this.router.navigate([`offline-dashboard`], {
                   replaceUrl: true,
@@ -713,16 +716,18 @@ export class DashboardPendingPage implements OnInit {
           if (result.data && result.data.event) {
             let eventData = result.data.event;
             eventData.forEach((event, index, array) => {
-              event.start_datetime = formatDate(
-                event.start_datetime,
-                'yyyy-MM-dd HH:mm',
-                this.locale
-              );
-              event.end_datetime = formatDate(
-                event.end_datetime,
-                'yyyy-MM-dd HH:mm',
-                this.locale
-              );
+              event.start_datetime =
+                formatDate(
+                  event.start_datetime,
+                  'yyyy-MM-dd HH:mm',
+                  this.locale
+                ) + ':00';
+              event.end_datetime =
+                formatDate(
+                  event.end_datetime,
+                  'yyyy-MM-dd HH:mm',
+                  this.locale
+                ) + ':00';
               this.db.addEvent(event).then((res) => {
                 AppConfig.consoleLog('new event added');
               });

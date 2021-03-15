@@ -29,6 +29,6 @@ export class SplashPage implements OnInit {
           this.router.navigate([`/activation`], { replaceUrl: true });
         }
       }
-    }, 1000);
+    }, 8000);
   }
 }

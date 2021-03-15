@@ -113,7 +113,7 @@ export class EventExtendModalPage implements AfterViewInit {
             .subscribe((_) => {});
         } else {
           this.db
-            .extendEventStatus(this.currentEventData?.id, endDateTime)
+            .extendEventStatus(this.currentEventData?.id, endDateTime + ':00')
             .then((res) => {
               this.toast
                 .show(
@@ -145,7 +145,7 @@ export class EventExtendModalPage implements AfterViewInit {
           this.locale
         );
         this.db
-          .extendEventStatus(this.currentEventData?.id, endDateTime)
+          .extendEventStatus(this.currentEventData?.id, endDateTime + ':00')
           .then((res) => {
             this.toast
               .show(

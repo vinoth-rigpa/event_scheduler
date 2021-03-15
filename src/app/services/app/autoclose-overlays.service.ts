@@ -8,6 +8,7 @@ import {
   ToastController,
 } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { AppConfig } from '../../config/appconfig';
 
 @Injectable({
   providedIn: 'root',

@@ -1,5 +1,4 @@
 import { Component, HostListener } from '@angular/core';
-
 import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
@@ -32,12 +31,7 @@ export class AppComponent {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
-      AppConfig.consoleLog('device_uuid', this.device.uuid);
       localStorage.setItem('device_uuid', this.device.uuid);
-      AppConfig.consoleLog(
-        'localStorage device_timeout',
-        localStorage.getItem('device_timeout')
-      );
       if (localStorage.getItem('device_timeout') == null) {
         localStorage.setItem('device_timeout', '30000');
       }
@@ -60,14 +54,12 @@ export class AppComponent {
     clearTimeout(this.idleLogoutTimer);
     let device_timeout = localStorage.getItem('device_timeout');
     let timeoutSecs: number = +device_timeout;
-    AppConfig.consoleLog(timeoutSecs + ' secs timeout restartIdleLogoutTimer');
     this.idleLogoutTimer = setTimeout(() => {
-      // this.redirectToHome();
+      this.redirectToHome();
     }, timeoutSecs);
   }
 
   redirectToHome() {
-    AppConfig.consoleLog('Page timeout triggered');
     if (localStorage.getItem('popup_open') == 'yes') {
       AppConfig.consoleLog('picker opend');
     } else {
