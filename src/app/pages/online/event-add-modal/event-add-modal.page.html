@@ -168,6 +168,30 @@
       </ion-list>
     </ion-item>
   </div>
+
+  <div>
+    <ion-item class="recu-item">
+      <ion-label position="stacked" class="recu-lbl">Upload Image</ion-label>
+      <ion-card *ngIf="images.length == 0">
+        <img src="assets/no-image.jpeg" />
+        <ion-card-content>
+          <ion-button color="medium" size="large" (click)="imageUpload()">
+            <ion-icon slot="icon-only" name="cloud-upload"></ion-icon>
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+      <ion-card *ngIf="images.length > 0">
+        <div *ngFor="let img of images; index as pos">
+          <img [src]="img.path" />
+          <ion-card-content>
+            <ion-button color="medium" size="large" (click)="imageUpload()">
+              <ion-icon slot="icon-only" name="cloud-upload"></ion-icon>
+            </ion-button>
+          </ion-card-content>
+        </div>
+      </ion-card>
+    </ion-item>
+  </div>
   <div class="submit-btn-div">
     <ion-button
       color="primary"

@@ -35,7 +35,7 @@ export class AppComponent {
       if (localStorage.getItem('device_timeout') == null) {
         localStorage.setItem('device_timeout', '30000');
       }
-      this.restartIdleLogoutTimer();
+      // this.restartIdleLogoutTimer();
       this.router.navigate([`/splash`], { replaceUrl: true });
     });
   }

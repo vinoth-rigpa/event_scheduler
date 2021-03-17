@@ -1,4 +1,10 @@
-import { Component, AfterViewInit, Inject, LOCALE_ID } from '@angular/core';
+import {
+  Component,
+  AfterViewInit,
+  Inject,
+  LOCALE_ID,
+  ChangeDetectorRef,
+} from '@angular/core';
 import {
   Validators,
   FormBuilder,
@@ -15,6 +21,15 @@ import * as moment from 'moment';
 import { Subscription } from 'rxjs';
 import { Network } from '@ionic-native/network/ngx';
 import { ApiService } from '../../../services/api/api.service';
+import { File, FileEntry } from '@ionic-native/File/ngx';
+import { WebView } from '@ionic-native/ionic-webview/ngx';
+import { Storage } from '@ionic/storage';
+import { FilePath } from '@ionic-native/file-path/ngx';
+import {
+  Camera,
+  CameraOptions,
+  PictureSourceType,
+} from '@ionic-native/Camera/ngx';
 
 @Component({
   selector: 'app-event-add-modal',
@@ -51,8 +66,11 @@ export class EventAddModalPage implements AfterViewInit {
   networkAvailable: boolean = false;
   responseData: any;
   isAdded = false;
+  fileUrl: any = null;
+  images = [];
 
   constructor(
+    private camera: Camera,
     private db: DbService,
     public loadingCtrl: LoadingController,
     public formBuilder: FormBuilder,
@@ -61,7 +79,12 @@ export class EventAddModalPage implements AfterViewInit {
     private modalCtrl: ModalController,
     public platform: Platform,
     private network: Network,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private file: File,
+    private webview: WebView,
+    private storage: Storage,
+    private ref: ChangeDetectorRef,
+    private filePath: FilePath
   ) {
     this.minDate = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
     this.maxDate = moment().add(1, 'y').format('YYYY-MM-DDTHH:mm:ss.SSSZ');
@@ -90,6 +113,143 @@ export class EventAddModalPage implements AfterViewInit {
       end_datetime: new FormControl('', Validators.required),
       organizer: new FormControl('', Validators.required),
       dept_password: new FormControl('', Validators.required),
+    });
+    this.platform.ready().then(() => {
+      this.loadStoredImages();
+    });
+  }
+
+  loadStoredImages() {
+    this.storage.get(AppConfig.IMAGE_STORAGE_KEY).then((images) => {
+      if (images) {
+        let arr = JSON.parse(images);
+        this.images = [];
+        for (let img of arr) {
+          let filePath = this.file.dataDirectory + img;
+          let resPath = this.pathForImage(filePath);
+          this.images.push({ name: img, path: resPath, filePath: filePath });
+        }
+      }
+    });
+  }
+
+  pathForImage(img) {
+    if (img === null) {
+      return '';
+    } else {
+      let converted = this.webview.convertFileSrc(img);
+      return converted;
+    }
+  }
+
+  imageUpload() {
+    this.takePicture(this.camera.PictureSourceType.PHOTOLIBRARY);
+  }
+
+  takePicture(sourceType: PictureSourceType) {
+    var options: CameraOptions = {
+      quality: 100,
+      sourceType: sourceType,
+      saveToPhotoAlbum: false,
+      correctOrientation: true,
+    };
+
+    this.camera.getPicture(options).then((imagePath) => {
+      if (
+        this.platform.is('android') &&
+        sourceType === this.camera.PictureSourceType.PHOTOLIBRARY
+      ) {
+        this.filePath.resolveNativePath(imagePath).then((filePath) => {
+          let correctPath = filePath.substr(0, filePath.lastIndexOf('/') + 1);
+          let currentName = imagePath.substring(
+            imagePath.lastIndexOf('/') + 1,
+            imagePath.lastIndexOf('?')
+          );
+          this.copyFileToLocalDir(
+            correctPath,
+            currentName,
+            this.createFileName()
+          );
+        });
+      } else {
+        var currentName = imagePath.substr(imagePath.lastIndexOf('/') + 1);
+        var correctPath = imagePath.substr(0, imagePath.lastIndexOf('/') + 1);
+        this.copyFileToLocalDir(
+          correctPath,
+          currentName,
+          this.createFileName()
+        );
+      }
+    });
+  }
+
+  createFileName() {
+    var d = new Date(),
+      n = d.getTime(),
+      newFileName = n + '.jpg';
+    return newFileName;
+  }
+
+  copyFileToLocalDir(namePath, currentName, newFileName) {
+    this.file
+      .copyFile(namePath, currentName, this.file.dataDirectory, newFileName)
+      .then(
+        (success) => {
+          this.updateStoredImages(newFileName);
+        },
+        (error) => {
+          this.toast
+            .show(`Error while storing file.`, '3000', 'bottom')
+            .subscribe((_) => {});
+        }
+      );
+  }
+
+  updateStoredImages(name) {
+    this.storage.get(AppConfig.IMAGE_STORAGE_KEY).then((images) => {
+      let arr = JSON.parse(images);
+      if (!arr) {
+        let newImages = [name];
+        this.storage.set(
+          AppConfig.IMAGE_STORAGE_KEY,
+          JSON.stringify(newImages)
+        );
+      } else {
+        arr.push(name);
+        this.storage.set(AppConfig.IMAGE_STORAGE_KEY, JSON.stringify(arr));
+      }
+
+      let filePath = this.file.dataDirectory + name;
+      let resPath = this.pathForImage(filePath);
+
+      let newEntry = {
+        name: name,
+        path: resPath,
+        filePath: filePath,
+      };
+
+      // this.images = [newEntry, ...this.images];
+      this.images = [newEntry];
+      this.ref.detectChanges(); // trigger change detection cycle
+    });
+  }
+
+  deleteImage(imgEntry, position) {
+    this.images.splice(position, 1);
+
+    this.storage.get(AppConfig.IMAGE_STORAGE_KEY).then((images) => {
+      let arr = JSON.parse(images);
+      let filtered = arr.filter((name) => name != imgEntry.name);
+      this.storage.set(AppConfig.IMAGE_STORAGE_KEY, JSON.stringify(filtered));
+
+      var correctPath = imgEntry.filePath.substr(
+        0,
+        imgEntry.filePath.lastIndexOf('/') + 1
+      );
+
+      this.file.removeFile(correctPath, imgEntry.name).then((res) => {
+        this.toast.show(`File removed.`, '3000', 'bottom').subscribe((_) => {});
+      });
     });
   }
 

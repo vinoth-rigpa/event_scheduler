@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { ActivationPageRoutingModule } from './activation-routing.module';
 import { ActivationPage } from './activation.page';
+import { QRCodeModule } from 'angularx-qrcode';
 
 @NgModule({
   imports: [
@@ -11,6 +12,7 @@ import { ActivationPage } from './activation.page';
     FormsModule,
     IonicModule,
     ActivationPageRoutingModule,
+    QRCodeModule,
   ],
   declarations: [ActivationPage],
 })

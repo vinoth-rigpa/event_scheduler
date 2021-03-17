@@ -2,17 +2,12 @@
   height: 100%;
   background: #fff !important;
   width: 100%;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .logo-holder {
-  margin: 0;
-  display: flex;
-  width: 30vw;
-  height: 20vh;
+  margin: 0 auto;
+  width: 300px;
+  height: 150px;
   background-image: url(/assets/imgs/logo.png);
   background-size: contain;
   background-repeat: no-repeat;
@@ -20,10 +15,13 @@
 }
 
 .content-holder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  margin: 0 auto;
+  width: 60vw;
+}
+
+qrcode {
+  display: table;
+  margin: 0 auto;
 }
 
 .text-input {
@@ -48,6 +46,8 @@
   border: 1px solid #304186;
   padding: 0;
   border-radius: 10px;
+  display: table;
+  margin: 0 auto !important;
 }
 
 .list .item-block .item-inner {

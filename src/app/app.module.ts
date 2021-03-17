@@ -18,6 +18,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { NativePageTransitions } from '@ionic-native/native-page-transitions/ngx';
+import { File } from '@ionic-native/File/ngx';
+import { WebView } from '@ionic-native/ionic-webview/ngx';
+import { FilePath } from '@ionic-native/file-path/ngx';
+import { Camera } from '@ionic-native/Camera/ngx';
+import { QRCodeModule } from 'angularx-qrcode';
+import { AES256 } from '@ionic-native/aes-256/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -36,6 +42,7 @@ import { NativePageTransitions } from '@ionic-native/native-page-transitions/ngx
       innerStrokeColor: '#9ba6c9',
       animationDuration: 300,
     }),
+    QRCodeModule,
   ],
   providers: [
     StatusBar,
@@ -48,6 +55,11 @@ import { NativePageTransitions } from '@ionic-native/native-page-transitions/ngx
     Toast,
     HTTP,
     Device,
+    File,
+    WebView,
+    FilePath,
+    Camera,
+    AES256,
     NativePageTransitions,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],

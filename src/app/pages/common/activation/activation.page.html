@@ -2,14 +2,19 @@
   <div class="page-content">
     <div class="logo-holder"></div>
     <div class="content-holder">
+      <qrcode
+        [qrdata]="device_uuid"
+        [width]="256"
+        [errorCorrectionLevel]="'M'"
+      ></qrcode>
       <p class="text-center">
-        Enter the 6 digits device activation code to get started.
+        Enter the device activation code to get started.
       </p>
       <ion-item class="text-input">
         <ion-input
           class="text-center"
           [(ngModel)]="device_otp"
-          type="tel"
+          type="text"
           (ionChange)="onKeyupOTP()"
           placeholder="Activation Code"
         ></ion-input>
