@@ -64,24 +64,29 @@ export class EventsCalendarPage implements OnInit {
     AppConfig.consoleLog(this.currentPage + ' OnInit');
     this.db.dbState().subscribe((res) => {
       if (res) {
-        let currentDateTime = formatDate(
-          new Date(),
-          'yyyy-MM-dd HH:mm',
-          this.locale
-        );
-        this.db.getEvents(currentDateTime).then((item) => {
-          this.eventsData = item;
-          for (var i = 0; i < this.eventsData.length; i++) {
-            this.eventSource.push({
-              title: this.eventsData[i].event_name,
-              startTime: new Date(this.eventsData[i].start_datetime),
-              endTime: new Date(this.eventsData[i].end_datetime),
-              allDay: false,
-            });
-          }
-          this.myCal.loadEvents();
+        this.loadEventSources();
+      }
+    });
+  }
+
+  loadEventSources() {
+    let currentDateTime = formatDate(
+      new Date(),
+      'yyyy-MM-dd HH:mm',
+      this.locale
+    );
+    this.db.getEvents(currentDateTime).then((item) => {
+      this.eventsData = item;
+      this.eventSource = [];
+      for (var i = 0; i < this.eventsData.length; i++) {
+        this.eventSource.push({
+          title: this.eventsData[i].event_name,
+          startTime: new Date(this.eventsData[i].start_datetime),
+          endTime: new Date(this.eventsData[i].end_datetime),
+          allDay: false,
         });
       }
+      this.myCal.loadEvents();
     });
   }
 
@@ -117,12 +122,12 @@ export class EventsCalendarPage implements OnInit {
           .then((item) => {
             this.eventsList = item;
             for (var i = 0; i < this.eventsList.length; i++) {
-              this.eventsList[i]['start_datetime'] = formatDate(
+              this.eventsList[i]['mstart_datetime'] = formatDate(
                 this.eventsList[i]['start_datetime'],
                 'MMM d, h:mm a',
                 this.locale
               );
-              this.eventsList[i]['end_datetime'] = formatDate(
+              this.eventsList[i]['mend_datetime'] = formatDate(
                 this.eventsList[i]['end_datetime'],
                 'MMM d, h:mm a',
                 this.locale
@@ -177,114 +182,10 @@ export class EventsCalendarPage implements OnInit {
               .then(async (res) => {
                 (await loader).dismiss();
                 if (res) {
-                  if (this.networkAvailable) {
-                    let loader = this.loadingCtrl.create({
-                      cssClass: 'custom-loader',
-                      spinner: 'lines-small',
-                    });
-                    (await loader).present();
-
-                    this.apiService
-                      .updateEventTable('delete', this.roomName, this.roomID, [
-                        {
-                          eventID: event.event_id,
-                          eventName: event.event_name,
-                          department: event.dept_name,
-                          organizer: event.organizer,
-                          startDateTime: event.start_datetime,
-                          endDateTime: event.start_datetime,
-                          password: event.dept_password,
-                        },
-                      ])
-                      .then(
-                        async (res: any) => {
-                          if (res?.status == 'success') {
-                            this.db.deleteEvent(event.id).then(async (res) => {
-                              this.eventSource = this.eventSource.filter(
-                                (item) =>
-                                  item.title !== event.event_name &&
-                                  item.startTime !==
-                                    new Date(event.start_datetime) &&
-                                  item.endTime !== new Date(event.end_datetime)
-                              );
-                              this.eventsList = this.eventsList.filter(
-                                (item) => item.id !== event.id
-                              );
-                              this.toast
-                                .show(`Event deleted`, '2000', 'bottom')
-                                .subscribe((_) => {});
-                            });
-                          }
-                          (await loader).dismiss();
-                        },
-                        async (err) => {
-                          (await loader).dismiss();
-                        }
-                      );
-                  } else {
-                    this.toast
-                      .show(`No internet available`, '2000', 'bottom')
-                      .subscribe((_) => {});
-                  }
+                  this.deleteEvent(event);
                 } else {
                   if (data.password == this.device_password) {
-                    if (this.networkAvailable) {
-                      let loader = this.loadingCtrl.create({
-                        cssClass: 'custom-loader',
-                        spinner: 'lines-small',
-                      });
-                      (await loader).present();
-
-                      this.apiService
-                        .updateEventTable(
-                          'delete',
-                          this.roomName,
-                          this.roomID,
-                          [
-                            {
-                              eventID: event.event_id,
-                              eventName: event.event_name,
-                              department: event.dept_name,
-                              organizer: event.organizer,
-                              startDateTime: event.start_datetime,
-                              endDateTime: event.start_datetime,
-                              password: event.dept_password,
-                            },
-                          ]
-                        )
-                        .then(
-                          async (res: any) => {
-                            if (res?.status == 'success') {
-                              this.db
-                                .deleteEvent(event.id)
-                                .then(async (res) => {
-                                  this.eventSource = this.eventSource.filter(
-                                    (item) =>
-                                      item.title !== event.event_name &&
-                                      item.startTime !==
-                                        new Date(event.start_datetime) &&
-                                      item.endTime !==
-                                        new Date(event.end_datetime)
-                                  );
-                                  this.eventsList = this.eventsList.filter(
-                                    (item) => item.id !== event.id
-                                  );
-                                  this.toast
-                                    .show(`Event deleted`, '2000', 'bottom')
-                                    .subscribe((_) => {});
-                                });
-                            }
-                            (await loader).dismiss();
-                          },
-                          async (err) => {
-                            (await loader).dismiss();
-                          }
-                        );
-                    } else {
-                      this.toast
-                        .show(`No internet available`, '2000', 'bottom')
-                        .subscribe((_) => {});
-                    }
+                    this.deleteEvent(event);
                   } else {
                     this.toast
                       .show(AppConfig.INVALID_PASSWORD_MSG, '2000', 'bottom')
@@ -297,6 +198,59 @@ export class EventsCalendarPage implements OnInit {
       ],
     });
     await alert.present();
+  }
+
+  async deleteEvent(event) {
+    if (this.networkAvailable) {
+      let loader = this.loadingCtrl.create({
+        cssClass: 'custom-loader',
+        spinner: 'lines-small',
+      });
+      (await loader).present();
+
+      this.apiService
+        .updateEventTable('delete', this.roomName, this.roomID, [
+          {
+            eventID: event.event_id,
+            eventName: event.event_name,
+            department: event.dept_name,
+            organizer: event.organizer,
+            startDateTime: event.start_datetime,
+            endDateTime: event.end_datetime,
+            password: event.dept_password,
+          },
+        ])
+        .then(
+          async (res: any) => {
+            if (res?.status == 'success') {
+              this.db.deleteEvent(event.id).then(async (res) => {
+                this.eventsList = this.eventsList.filter(
+                  (item) => item.id !== event.id
+                );
+                this.toast
+                  .show(`Event deleted`, '2000', 'bottom')
+                  .subscribe((_) => {});
+                this.loadEventSources();
+              });
+            } else if (res?.status == 'error' || res?.status == 'failure') {
+              this.toast
+                .show(` ` + res?.reason + ` `, '2000', 'bottom')
+                .subscribe((_) => {});
+            }
+            (await loader).dismiss();
+          },
+          async (err) => {
+            (await loader).dismiss();
+            this.toast
+              .show(`Server unreachable. Try again later.`, '2000', 'bottom')
+              .subscribe((_) => {});
+          }
+        );
+    } else {
+      this.toast
+        .show(`No internet available`, '2000', 'bottom')
+        .subscribe((_) => {});
+    }
   }
 
   async onEventSelected(event) {

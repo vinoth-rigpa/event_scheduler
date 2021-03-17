@@ -70,6 +70,7 @@ export class SettingsPage implements OnInit {
           text: 'Ok',
           handler: (data: any) => {
             this.db.changeRoomName(data.name).then((res) => {
+              this.roomName = data.name;
               this.toast
                 .show(`Room Name updated successfully`, '2000', 'bottom')
                 .subscribe((_) => {});

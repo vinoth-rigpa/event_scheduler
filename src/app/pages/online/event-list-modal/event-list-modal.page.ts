@@ -67,12 +67,12 @@ export class EventListModalPage implements AfterViewInit {
           this.db.getUpcomingEventsByDate(currentDateTime).then((item) => {
             this.eventsList = item;
             for (var i = 0; i < this.eventsList.length; i++) {
-              this.eventsList[i]['start_datetime'] = formatDate(
+              this.eventsList[i]['mstart_datetime'] = formatDate(
                 this.eventsList[i]['start_datetime'],
                 'MMM d, h:mm a',
                 this.locale
               );
-              this.eventsList[i]['end_datetime'] = formatDate(
+              this.eventsList[i]['mend_datetime'] = formatDate(
                 this.eventsList[i]['end_datetime'],
                 'MMM d, h:mm a',
                 this.locale
@@ -111,101 +111,10 @@ export class EventListModalPage implements AfterViewInit {
               .then(async (res) => {
                 (await loader).dismiss();
                 if (res) {
-                  if (this.networkAvailable) {
-                    let loader = this.loadingCtrl.create({
-                      cssClass: 'custom-loader',
-                      spinner: 'lines-small',
-                    });
-                    (await loader).present();
-
-                    this.apiService
-                      .updateEventTable('delete', this.roomName, this.roomID, [
-                        {
-                          eventID: event.event_id,
-                          eventName: event.event_name,
-                          department: event.dept_name,
-                          organizer: event.organizer,
-                          startDateTime: event.start_datetime,
-                          endDateTime: event.start_datetime,
-                          password: event.dept_password,
-                        },
-                      ])
-                      .then(
-                        async (res: any) => {
-                          if (res?.status == 'success') {
-                            this.db.deleteEvent(event.id).then(async (res) => {
-                              this.eventsList = this.eventsList.filter(
-                                (item) => item.id !== event.id
-                              );
-                              this.isDeleted = true;
-                              this.toast
-                                .show(`Event deleted`, '2000', 'bottom')
-                                .subscribe((_) => {});
-                            });
-                          }
-                          (await loader).dismiss();
-                        },
-                        async (err) => {
-                          (await loader).dismiss();
-                        }
-                      );
-                  } else {
-                    this.toast
-                      .show(`No internet available`, '2000', 'bottom')
-                      .subscribe((_) => {});
-                  }
+                  this.deleteEvent(event);
                 } else {
                   if (data.password == this.device_password) {
-                    if (this.networkAvailable) {
-                      let loader = this.loadingCtrl.create({
-                        cssClass: 'custom-loader',
-                        spinner: 'lines-small',
-                      });
-                      (await loader).present();
-
-                      this.apiService
-                        .updateEventTable(
-                          'delete',
-                          this.roomName,
-                          this.roomID,
-                          [
-                            {
-                              eventID: event.event_id,
-                              eventName: event.event_name,
-                              department: event.dept_name,
-                              organizer: event.organizer,
-                              startDateTime: event.start_datetime,
-                              endDateTime: event.start_datetime,
-                              password: event.dept_password,
-                            },
-                          ]
-                        )
-                        .then(
-                          async (res: any) => {
-                            if (res?.status == 'success') {
-                              this.db
-                                .deleteEvent(event.id)
-                                .then(async (res) => {
-                                  this.eventsList = this.eventsList.filter(
-                                    (item) => item.id !== event.id
-                                  );
-                                  this.isDeleted = true;
-                                  this.toast
-                                    .show(`Event deleted`, '2000', 'bottom')
-                                    .subscribe((_) => {});
-                                });
-                            }
-                            (await loader).dismiss();
-                          },
-                          async (err) => {
-                            (await loader).dismiss();
-                          }
-                        );
-                    } else {
-                      this.toast
-                        .show(`No internet available`, '2000', 'bottom')
-                        .subscribe((_) => {});
-                    }
+                    this.deleteEvent(event);
                   } else {
                     this.toast
                       .show(AppConfig.INVALID_PASSWORD_MSG, '2000', 'bottom')
@@ -218,6 +127,59 @@ export class EventListModalPage implements AfterViewInit {
       ],
     });
     await alert.present();
+  }
+
+  async deleteEvent(event) {
+    if (this.networkAvailable) {
+      let loader = this.loadingCtrl.create({
+        cssClass: 'custom-loader',
+        spinner: 'lines-small',
+      });
+      (await loader).present();
+
+      this.apiService
+        .updateEventTable('delete', this.roomName, this.roomID, [
+          {
+            eventID: event.event_id,
+            eventName: event.event_name,
+            department: event.dept_name,
+            organizer: event.organizer,
+            startDateTime: event.start_datetime,
+            endDateTime: event.end_datetime,
+            password: event.dept_password,
+          },
+        ])
+        .then(
+          async (res: any) => {
+            if (res?.status == 'success') {
+              this.db.deleteEvent(event.id).then(async (res) => {
+                this.eventsList = this.eventsList.filter(
+                  (item) => item.id !== event.id
+                );
+                this.isDeleted = true;
+                this.toast
+                  .show(`Event deleted`, '2000', 'bottom')
+                  .subscribe((_) => {});
+              });
+            } else if (res?.status == 'error' || res?.status == 'failure') {
+              this.toast
+                .show(` ` + res?.reason + ` `, '2000', 'bottom')
+                .subscribe((_) => {});
+            }
+            (await loader).dismiss();
+          },
+          async (err) => {
+            (await loader).dismiss();
+            this.toast
+              .show(`Server unreachable. Try again later.`, '2000', 'bottom')
+              .subscribe((_) => {});
+          }
+        );
+    } else {
+      this.toast
+        .show(`No internet available`, '2000', 'bottom')
+        .subscribe((_) => {});
+    }
   }
 
   close() {

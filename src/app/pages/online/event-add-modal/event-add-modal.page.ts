@@ -6,12 +6,15 @@ import {
   FormControl,
 } from '@angular/forms';
 import { formatDate } from '@angular/common';
-import { ModalController, LoadingController } from '@ionic/angular';
+import { Platform, ModalController, LoadingController } from '@ionic/angular';
 import { Toast } from '@ionic-native/toast/ngx';
 import { Department } from '../../../models/department';
 import { DbService } from '../../../services/db/db.service';
 import { AppConfig } from '../../../config/appconfig';
 import * as moment from 'moment';
+import { Subscription } from 'rxjs';
+import { Network } from '@ionic-native/network/ngx';
+import { ApiService } from '../../../services/api/api.service';
 
 @Component({
   selector: 'app-event-add-modal',
@@ -22,6 +25,8 @@ export class EventAddModalPage implements AfterViewInit {
   currentPage: string = 'Online EventAddModalPage';
   device_uuid: any = '';
   device_password: any = '';
+  roomName: string = '';
+  roomID: string = '';
   modalReady = false;
   departmentData: Department[] = [];
   eventForm: FormGroup;
@@ -41,6 +46,11 @@ export class EventAddModalPage implements AfterViewInit {
   masterCheck: boolean;
   checkBoxList: any;
   isRecurring: boolean;
+  connectSubscription: Subscription = new Subscription();
+  disconnectSubscription: Subscription = new Subscription();
+  networkAvailable: boolean = false;
+  responseData: any;
+  isAdded = false;
 
   constructor(
     private db: DbService,
@@ -48,12 +58,17 @@ export class EventAddModalPage implements AfterViewInit {
     public formBuilder: FormBuilder,
     @Inject(LOCALE_ID) private locale: string,
     private toast: Toast,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    public platform: Platform,
+    private network: Network,
+    private apiService: ApiService
   ) {
     this.minDate = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
     this.maxDate = moment().add(1, 'y').format('YYYY-MM-DDTHH:mm:ss.SSSZ');
     this.device_uuid = localStorage.getItem('device_uuid');
     this.device_password = localStorage.getItem('device_password');
+    this.roomID = localStorage.getItem('room_id');
+    this.roomName = localStorage.getItem('room_name');
     this.checkBoxList = [
       { number: 0, value: 'Sun', isChecked: false },
       { number: 1, value: 'Mon', isChecked: false },
@@ -185,165 +200,13 @@ export class EventAddModalPage implements AfterViewInit {
               (await loader).dismiss();
               if (res) {
                 localStorage.setItem('popup_open', 'no');
-                if (this.isRecurring) {
-                  let eTime = formatDate(
-                    this.eventForm.value.end_datetime,
-                    'HH:mm',
-                    this.locale
-                  );
-                  let sTime = formatDate(
-                    this.eventForm.value.start_datetime,
-                    'HH:mm',
-                    this.locale
-                  );
-                  let currentDate = formatDate(
-                    new Date(),
-                    'yyyy-MM-dd',
-                    this.locale
-                  );
-                  let endDate = moment(currentDate).add(60, 'd').toDate();
-                  let start = moment(currentDate);
-                  let end = moment(endDate);
-                  let day = 0;
-                  let eventDataArr = [];
-                  for (let i = 0; i < this.checkBoxList.length; i++) {
-                    if (this.checkBoxList[i].isChecked) {
-                      day = this.checkBoxList[i].number;
-                      var current = start.clone();
-                      if (new Date().getDay() == day) {
-                        let eventData = {
-                          event_id:
-                            start.clone().format('yyyyMMDD') +
-                            formatDate(
-                              this.eventForm.value.start_datetime,
-                              'HHmmss',
-                              this.locale
-                            ),
-                          event_name: this.eventForm.value.event_name,
-                          dept_name: this.eventForm.value.dept_name,
-                          start_datetime:
-                            start.clone().format('yyyy-MM-DD') + ' ' + sTime,
-                          end_datetime:
-                            start.clone().format('yyyy-MM-DD') + ' ' + eTime,
-                          organizer: this.eventForm.value.organizer,
-                          dept_password: this.eventForm.value.dept_password,
-                        };
-                        eventDataArr.push(eventData);
-                      }
-                      while (current.day(7 + day).isBefore(end)) {
-                        let eventData = {
-                          event_id:
-                            current.clone().format('yyyyMMDD') +
-                            formatDate(
-                              this.eventForm.value.start_datetime,
-                              'HHmmss',
-                              this.locale
-                            ),
-                          event_name: this.eventForm.value.event_name,
-                          dept_name: this.eventForm.value.dept_name,
-                          start_datetime:
-                            current.clone().format('yyyy-MM-DD') + ' ' + sTime,
-                          end_datetime:
-                            current.clone().format('yyyy-MM-DD') + ' ' + eTime,
-                          organizer: this.eventForm.value.organizer,
-                          dept_password: this.eventForm.value.dept_password,
-                        };
-                        eventDataArr.push(eventData);
-                      }
-                    }
-                  }
-                  if (eventDataArr.length > 0) {
-                    this.modalCtrl.dismiss({ event: eventDataArr });
-                  } else {
-                    this.modalCtrl.dismiss({ event: [this.eventForm.value] });
-                  }
-                } else {
-                  this.modalCtrl.dismiss({ event: [this.eventForm.value] });
-                }
+                this.addEvent();
               } else {
                 if (
                   this.eventForm.value.dept_password == this.device_password
                 ) {
                   localStorage.setItem('popup_open', 'no');
-                  if (this.isRecurring) {
-                    let eTime = formatDate(
-                      this.eventForm.value.end_datetime,
-                      'HH:mm',
-                      this.locale
-                    );
-                    let sTime = formatDate(
-                      this.eventForm.value.start_datetime,
-                      'HH:mm',
-                      this.locale
-                    );
-                    let currentDate = formatDate(
-                      new Date(),
-                      'yyyy-MM-dd',
-                      this.locale
-                    );
-                    let endDate = moment(currentDate).add(60, 'd').toDate();
-                    let start = moment(currentDate);
-                    let end = moment(endDate);
-                    let day = 0;
-                    let eventDataArr = [];
-                    for (let i = 0; i < this.checkBoxList.length; i++) {
-                      if (this.checkBoxList[i].isChecked) {
-                        day = this.checkBoxList[i].number;
-                        var current = start.clone();
-                        if (new Date().getDay() == day) {
-                          let eventData = {
-                            event_id:
-                              start.clone().format('yyyyMMDD') +
-                              formatDate(
-                                this.eventForm.value.start_datetime,
-                                'HHmmss',
-                                this.locale
-                              ),
-                            event_name: this.eventForm.value.event_name,
-                            dept_name: this.eventForm.value.dept_name,
-                            start_datetime:
-                              start.clone().format('yyyy-MM-DD') + ' ' + sTime,
-                            end_datetime:
-                              start.clone().format('yyyy-MM-DD') + ' ' + eTime,
-                            organizer: this.eventForm.value.organizer,
-                            dept_password: this.eventForm.value.dept_password,
-                          };
-                          eventDataArr.push(eventData);
-                        }
-                        while (current.day(7 + day).isBefore(end)) {
-                          let eventData = {
-                            event_id:
-                              current.clone().format('yyyyMMDD') +
-                              formatDate(
-                                this.eventForm.value.start_datetime,
-                                'HHmmss',
-                                this.locale
-                              ),
-                            event_name: this.eventForm.value.event_name,
-                            dept_name: this.eventForm.value.dept_name,
-                            start_datetime:
-                              current.clone().format('yyyy-MM-DD') +
-                              ' ' +
-                              sTime,
-                            end_datetime:
-                              current.clone().format('yyyy-MM-DD') +
-                              ' ' +
-                              eTime,
-                            organizer: this.eventForm.value.organizer,
-                            dept_password: this.eventForm.value.dept_password,
-                          };
-                          eventDataArr.push(eventData);
-                        }
-                      }
-                    }
-                    if (eventDataArr.length > 0) {
-                      this.modalCtrl.dismiss({ event: eventDataArr });
-                    } else {
-                      this.modalCtrl.dismiss({ event: [this.eventForm.value] });
-                    }
-                  } else {
-                    this.modalCtrl.dismiss({ event: [this.eventForm.value] });
-                  }
+                  this.addEvent();
                 } else {
                   this.toast
                     .show(AppConfig.INVALID_PASSWORD_MSG, '2000', 'bottom')
@@ -356,12 +219,186 @@ export class EventAddModalPage implements AfterViewInit {
     }
   }
 
+  async addEvent() {
+    let eTime = formatDate(
+      this.eventForm.value.end_datetime,
+      'HH:mm',
+      this.locale
+    );
+    let sTime = formatDate(
+      this.eventForm.value.start_datetime,
+      'HH:mm',
+      this.locale
+    );
+    let currentDate = formatDate(new Date(), 'yyyy-MM-dd', this.locale);
+    let endDate = moment(currentDate).add(60, 'd').toDate();
+    let start = moment(currentDate);
+    let end = moment(endDate);
+    let day = 0;
+    let eventDataArr = [];
+    for (let i = 0; i < this.checkBoxList.length; i++) {
+      if (this.checkBoxList[i].isChecked) {
+        day = this.checkBoxList[i].number;
+        var current = start.clone();
+        if (new Date().getDay() == day) {
+          let eventData = {
+            event_id:
+              start.clone().format('yyyyMMDD') +
+              formatDate(
+                this.eventForm.value.start_datetime,
+                'HHmmss',
+                this.locale
+              ),
+            event_name: this.eventForm.value.event_name,
+            dept_name: this.eventForm.value.dept_name,
+            start_datetime: start.clone().format('yyyy-MM-DD') + ' ' + sTime,
+            end_datetime: start.clone().format('yyyy-MM-DD') + ' ' + eTime,
+            organizer: this.eventForm.value.organizer,
+            dept_password: this.eventForm.value.dept_password,
+          };
+          eventDataArr.push(eventData);
+        }
+        while (current.day(7 + day).isBefore(end)) {
+          let eventData = {
+            event_id:
+              current.clone().format('yyyyMMDD') +
+              formatDate(
+                this.eventForm.value.start_datetime,
+                'HHmmss',
+                this.locale
+              ),
+            event_name: this.eventForm.value.event_name,
+            dept_name: this.eventForm.value.dept_name,
+            start_datetime: current.clone().format('yyyy-MM-DD') + ' ' + sTime,
+            end_datetime: current.clone().format('yyyy-MM-DD') + ' ' + eTime,
+            organizer: this.eventForm.value.organizer,
+            dept_password: this.eventForm.value.dept_password,
+          };
+          eventDataArr.push(eventData);
+        }
+      }
+    }
+    if (eventDataArr.length == 0) {
+      eventDataArr.push(this.eventForm.value);
+    }
+    if (eventDataArr.length > 0) {
+      let eventData = eventDataArr;
+      let eventInputArr = [];
+      eventData.forEach((event, index, array) => {
+        event.start_datetime =
+          formatDate(event.start_datetime, 'yyyy-MM-dd HH:mm', this.locale) +
+          ':00';
+        event.end_datetime =
+          formatDate(event.end_datetime, 'yyyy-MM-dd HH:mm', this.locale) +
+          ':00';
+
+        let eventInputItem = {
+          eventID: event.event_id,
+          eventName: event.event_name,
+          department: event.dept_name,
+          organizer: event.organizer,
+          startDateTime: event.start_datetime,
+          endDateTime: event.end_datetime,
+          password: event.dept_password,
+        };
+
+        eventInputArr.push(eventInputItem);
+      });
+
+      AppConfig.consoleLog('eventInputArr', eventInputArr);
+
+      if (this.networkAvailable) {
+        let loader = this.loadingCtrl.create({
+          cssClass: 'custom-loader',
+          spinner: 'lines-small',
+        });
+        (await loader).present();
+
+        this.apiService
+          .setEventTable(this.roomName, this.roomID, eventInputArr)
+          .then(
+            async (res: any) => {
+              if (res?.status == 'success') {
+                eventData.forEach((event, index, array) => {
+                  event.start_datetime =
+                    formatDate(
+                      event.start_datetime,
+                      'yyyy-MM-dd HH:mm',
+                      this.locale
+                    ) + ':00';
+                  event.end_datetime =
+                    formatDate(
+                      event.end_datetime,
+                      'yyyy-MM-dd HH:mm',
+                      this.locale
+                    ) + ':00';
+                  this.db.addEvent(event).then((res) => {
+                    AppConfig.consoleLog('new event added');
+                  });
+                  if (index === array.length - 1) {
+                    AppConfig.consoleLog('add event - last index');
+                    this.isAdded = true;
+                    this.modalCtrl.dismiss({ isAdded: this.isAdded });
+                  }
+                });
+              } else if (res?.status == 'error' || res?.status == 'failure') {
+                this.toast
+                  .show(` ` + res?.reason + ` `, '2000', 'bottom')
+                  .subscribe((_) => {});
+              }
+              (await loader).dismiss();
+            },
+            async (err) => {
+              (await loader).dismiss();
+              this.toast
+                .show(`Server unreachable. Try again later.`, '2000', 'bottom')
+                .subscribe((_) => {});
+            }
+          );
+      } else {
+        this.toast
+          .show(`No internet available`, '2000', 'bottom')
+          .subscribe((_) => {});
+      }
+    }
+  }
+
   openPopupWindow() {
     localStorage.setItem('popup_open', 'yes');
   }
 
   close() {
     localStorage.setItem('popup_open', 'no');
-    this.modalCtrl.dismiss();
+    this.modalCtrl.dismiss({ isAdded: this.isAdded });
+  }
+
+  isConnected(): boolean {
+    let conntype = this.network.type;
+    return conntype && conntype !== 'unknown' && conntype !== 'none';
+  }
+
+  networkSubscribe() {
+    this.network.onDisconnect().subscribe(() => {
+      this.networkAvailable = false;
+    });
+    this.network.onConnect().subscribe(() => {
+      this.networkAvailable = true;
+    });
+  }
+
+  networkUnsubscribe() {
+    this.connectSubscription.unsubscribe();
+    this.disconnectSubscription.unsubscribe();
+  }
+
+  ionViewDidEnter() {
+    if (this.isConnected()) {
+      this.networkAvailable = true;
+      AppConfig.consoleLog('Network available');
+    } else {
+      this.networkAvailable = false;
+      AppConfig.consoleLog('Network unavailable');
+    }
+    this.networkSubscribe();
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, LOCALE_ID } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { Department } from '../../models/department';
 import { DeviceCodes } from '../../models/device-codes';
@@ -9,6 +9,8 @@ import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite/ngx';
 import { Event } from '../../models/event';
 import { AppConfig } from '../../config/appconfig';
+import * as moment from 'moment';
+import { formatDate } from '@angular/common';
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +20,7 @@ export class DbService {
   private isDbReady: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(
+    @Inject(LOCALE_ID) private locale: string,
     private platform: Platform,
     private sqlite: SQLite,
     private httpClient: HttpClient,
@@ -244,6 +247,7 @@ export class DbService {
             organizer: res.rows.item(i).organizer,
             start_datetime: res.rows.item(i).start_datetime,
             end_datetime: res.rows.item(i).end_datetime,
+            aend_datetime: res.rows.item(i).aend_datetime,
             dept_password: res.rows.item(i).dept_password,
             event_status: res.rows.item(i).event_status,
             sync_status: res.rows.item(i).sync_status,
@@ -272,6 +276,7 @@ export class DbService {
               organizer: res.rows.item(i).organizer,
               start_datetime: res.rows.item(i).start_datetime,
               end_datetime: res.rows.item(i).end_datetime,
+              aend_datetime: res.rows.item(i).aend_datetime,
               dept_password: res.rows.item(i).dept_password,
               event_status: res.rows.item(i).event_status,
               sync_status: res.rows.item(i).sync_status,
@@ -300,6 +305,7 @@ export class DbService {
               organizer: res.rows.item(i).organizer,
               start_datetime: res.rows.item(i).start_datetime,
               end_datetime: res.rows.item(i).end_datetime,
+              aend_datetime: res.rows.item(i).aend_datetime,
               dept_password: res.rows.item(i).dept_password,
               event_status: res.rows.item(i).event_status,
               sync_status: res.rows.item(i).sync_status,
@@ -326,6 +332,7 @@ export class DbService {
             organizer: res.rows.item(0).organizer,
             start_datetime: res.rows.item(0).start_datetime,
             end_datetime: res.rows.item(0).end_datetime,
+            aend_datetime: res.rows.item(0).aend_datetime,
             dept_password: res.rows.item(0).dept_password,
             event_status: res.rows.item(0).event_status,
             sync_status: res.rows.item(0).sync_status,
@@ -338,6 +345,11 @@ export class DbService {
 
   // Add
   addEvent(event: Event) {
+    let newDateObj = moment(new Date(event.end_datetime))
+      .subtract(1, 'm')
+      .toDate();
+    let aendDateTime =
+      formatDate(newDateObj, 'yyyy-MM-dd HH:mm', this.locale) + ':59';
     let data = [
       event.event_id,
       event.event_name,
@@ -345,11 +357,12 @@ export class DbService {
       event.organizer,
       event.start_datetime,
       event.end_datetime,
+      aendDateTime,
       event.dept_password,
     ];
     return this.storage
       .executeSql(
-        'INSERT INTO events (event_id, event_name,dept_name,organizer,start_datetime,end_datetime,dept_password) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO events (event_id, event_name,dept_name,organizer,start_datetime,end_datetime,aend_datetime,dept_password) VALUES (?, ?, ?, ?, ?,?, ?, ?)',
         data
       )
       .then((res) => {
@@ -358,6 +371,11 @@ export class DbService {
   }
 
   bookEvent(event: Event) {
+    let newDateObj = moment(new Date(event.end_datetime))
+      .subtract(1, 'm')
+      .toDate();
+    let aendDateTime =
+      formatDate(newDateObj, 'yyyy-MM-dd HH:mm', this.locale) + ':59';
     let data = [
       event.event_id,
       event.event_name,
@@ -365,12 +383,13 @@ export class DbService {
       event.organizer,
       event.start_datetime,
       event.end_datetime,
+      aendDateTime,
       event.dept_password,
       1,
     ];
     return this.storage
       .executeSql(
-        'INSERT INTO events (event_id, event_name,dept_name,organizer,start_datetime,end_datetime,dept_password,event_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO events (event_id, event_name,dept_name,organizer,start_datetime,end_datetime,aend_datetime,dept_password,event_status) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?)',
         data
       )
       .then((res) => {
@@ -391,6 +410,7 @@ export class DbService {
           organizer: res.rows.item(0).organizer,
           start_datetime: res.rows.item(0).start_datetime,
           end_datetime: res.rows.item(0).end_datetime,
+          aend_datetime: res.rows.item(0).aend_datetime,
           dept_password: res.rows.item(0).dept_password,
           event_status: res.rows.item(0).event_status,
           sync_status: res.rows.item(0).sync_status,
@@ -400,6 +420,11 @@ export class DbService {
 
   // Update
   updateEvent(id, event: Event) {
+    let newDateObj = moment(new Date(event.end_datetime))
+      .subtract(1, 'm')
+      .toDate();
+    let aendDateTime =
+      formatDate(newDateObj, 'yyyy-MM-dd HH:mm', this.locale) + ':59';
     let data = [
       event.event_id,
       event.event_name,
@@ -407,11 +432,12 @@ export class DbService {
       event.organizer,
       event.start_datetime,
       event.end_datetime,
+      aendDateTime,
       event.dept_password,
     ];
     return this.storage
       .executeSql(
-        `UPDATE events SET event_id = ?, event_name = ?,dept_name = ?,organizer = ?,start_datetime = ?,end_datetime = ?,dept_password = ? WHERE id = ${id}`,
+        `UPDATE events SET event_id = ?, event_name = ?,dept_name = ?,organizer = ?,start_datetime = ?,end_datetime = ?,aend_datetime = ?,dept_password = ? WHERE id = ${id}`,
         data
       )
       .then((res) => {
@@ -441,6 +467,7 @@ export class DbService {
             organizer: res.rows.item(0).organizer,
             start_datetime: res.rows.item(0).start_datetime,
             end_datetime: res.rows.item(0).end_datetime,
+            aend_datetime: res.rows.item(0).aend_datetime,
             dept_password: res.rows.item(0).dept_password,
             event_status: res.rows.item(0).event_status,
             sync_status: res.rows.item(0).sync_status,
@@ -458,10 +485,14 @@ export class DbService {
   }
 
   releaseEventStatus(id, pmEndDate) {
+    pmEndDate = pmEndDate + ':00';
+    let newDateObj = moment(new Date(pmEndDate)).subtract(1, 'm').toDate();
+    let aendDateTime =
+      formatDate(newDateObj, 'yyyy-MM-dd HH:mm', this.locale) + ':59';
     return this.storage
       .executeSql(
-        `UPDATE events SET event_status = 2,end_datetime=?  WHERE id = ${id}`,
-        [pmEndDate]
+        `UPDATE events SET event_status = 2,end_datetime=?,aend_datetime=?  WHERE id = ${id}`,
+        [pmEndDate, aendDateTime]
       )
       .then((res) => {
         AppConfig.consoleLog('res', res);
@@ -469,10 +500,14 @@ export class DbService {
   }
 
   extendEventStatus(id, pmEndDate) {
+    pmEndDate = pmEndDate + ':00';
+    let newDateObj = moment(new Date(pmEndDate)).subtract(1, 'm').toDate();
+    let aendDateTime =
+      formatDate(newDateObj, 'yyyy-MM-dd HH:mm', this.locale) + ':59';
     return this.storage
       .executeSql(
-        `UPDATE events SET event_status = 1,end_datetime=?  WHERE id = ${id}`,
-        [pmEndDate]
+        `UPDATE events SET event_status = 1,end_datetime=?,aend_datetime = ? WHERE id = ${id}`,
+        [pmEndDate, aendDateTime]
       )
       .then((res) => {
         AppConfig.consoleLog('res', res);
@@ -482,7 +517,7 @@ export class DbService {
   checkEventExists(pmStartDatetime, pmEndDatetime): Promise<Event> {
     return this.storage
       .executeSql(
-        "SELECT * FROM events WHERE event_status != 2 AND (((strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime)) OR (strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime)) OR (strftime('%s', start_datetime) BETWEEN strftime('%s', ?) AND  strftime('%s', ?)) OR (strftime('%s', end_datetime) BETWEEN strftime('%s', ?) AND  strftime('%s', ?))))",
+        "SELECT * FROM events WHERE event_status != 2 AND (((strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', aend_datetime)) OR (strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', aend_datetime)) OR (strftime('%s', start_datetime) BETWEEN strftime('%s', ?) AND  strftime('%s', ?)) OR (strftime('%s', aend_datetime) BETWEEN strftime('%s', ?) AND  strftime('%s', ?))))",
         [
           pmStartDatetime,
           pmEndDatetime,
@@ -501,6 +536,7 @@ export class DbService {
             dept_name: res.rows.item(0).dept_name,
             organizer: res.rows.item(0).organizer,
             start_datetime: res.rows.item(0).start_datetime,
+            aend_datetime: res.rows.item(0).aend_datetime,
             end_datetime: res.rows.item(0).end_datetime,
             dept_password: res.rows.item(0).dept_password,
             event_status: res.rows.item(0).event_status,
@@ -523,6 +559,7 @@ export class DbService {
             organizer: res.rows.item(0).organizer,
             start_datetime: res.rows.item(0).start_datetime,
             end_datetime: res.rows.item(0).end_datetime,
+            aend_datetime: res.rows.item(0).aend_datetime,
             dept_password: res.rows.item(0).dept_password,
             event_status: res.rows.item(0).event_status,
             sync_status: res.rows.item(0).sync_status,
@@ -538,7 +575,7 @@ export class DbService {
   ): Promise<Event> {
     return this.storage
       .executeSql(
-        "SELECT * FROM events WHERE event_id != ? AND event_status != 2 AND (((strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime)) OR (strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime)) OR (strftime('%s', start_datetime) BETWEEN strftime('%s', ?) AND  strftime('%s', ?)) OR (strftime('%s', end_datetime) BETWEEN strftime('%s', ?) AND  strftime('%s', ?))))",
+        "SELECT * FROM events WHERE event_id != ? AND event_status != 2 AND (((strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', aend_datetime)) OR (strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', aend_datetime)) OR (strftime('%s', start_datetime) BETWEEN strftime('%s', ?) AND  strftime('%s', ?)) OR (strftime('%s', aend_datetime) BETWEEN strftime('%s', ?) AND  strftime('%s', ?))))",
         [
           eventId,
           pmStartDatetime,
@@ -559,6 +596,7 @@ export class DbService {
             organizer: res.rows.item(0).organizer,
             start_datetime: res.rows.item(0).start_datetime,
             end_datetime: res.rows.item(0).end_datetime,
+            aend_datetime: res.rows.item(0).aend_datetime,
             dept_password: res.rows.item(0).dept_password,
             event_status: res.rows.item(0).event_status,
             sync_status: res.rows.item(0).sync_status,
@@ -570,7 +608,7 @@ export class DbService {
   getEventStatus(pmDatetime): Promise<Event> {
     return this.storage
       .executeSql(
-        "SELECT * FROM events WHERE event_status != 2 AND (strftime('%s', ?) = strftime('%s', start_datetime) OR strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime))",
+        "SELECT * FROM events WHERE event_status != 2 AND (strftime('%s', ?) = strftime('%s', start_datetime) OR strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', aend_datetime))",
         [pmDatetime, pmDatetime]
       )
       .then((res) => {
@@ -583,6 +621,7 @@ export class DbService {
             organizer: res.rows.item(0).organizer,
             start_datetime: res.rows.item(0).start_datetime,
             end_datetime: res.rows.item(0).end_datetime,
+            aend_datetime: res.rows.item(0).aend_datetime,
             dept_password: res.rows.item(0).dept_password,
             event_status: res.rows.item(0).event_status,
             sync_status: res.rows.item(0).sync_status,
@@ -594,7 +633,7 @@ export class DbService {
   getUpcomingEventsByDate(pmDate, limit = 10) {
     return this.storage
       .executeSql(
-        "SELECT * FROM events WHERE event_status != 2 AND (strftime('%s', start_datetime) > strftime('%s', ?) OR (strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', end_datetime))) ORDER BY strftime('%s', start_datetime) ASC LIMIT ?",
+        "SELECT * FROM events WHERE event_status != 2 AND (strftime('%s', start_datetime) > strftime('%s', ?) OR (strftime('%s', ?) BETWEEN strftime('%s', start_datetime) AND  strftime('%s', aend_datetime))) ORDER BY strftime('%s', start_datetime) ASC LIMIT ?",
         [pmDate, pmDate, limit]
       )
       .then((res) => {
@@ -609,6 +648,7 @@ export class DbService {
               organizer: res.rows.item(i).organizer,
               start_datetime: res.rows.item(i).start_datetime,
               end_datetime: res.rows.item(i).end_datetime,
+              aend_datetime: res.rows.item(i).aend_datetime,
               dept_password: res.rows.item(i).dept_password,
               event_status: res.rows.item(i).event_status,
               sync_status: res.rows.item(i).sync_status,

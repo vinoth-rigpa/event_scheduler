@@ -29,7 +29,8 @@ CREATE TABLE IF NOT EXISTS events(
     dept_name TEXT NOT NULL, 
     organizer TEXT NOT NULL, 
     start_datetime TEXT NOT NULL, 
-    end_datetime TEXT NOT NULL, 
+    end_datetime TEXT NOT NULL,
+    aend_datetime TEXT NOT NULL,
     dept_password TEXT NOT NULL,
     event_status INTEGER DEFAULT 0,
     sync_status INTEGER DEFAULT 0

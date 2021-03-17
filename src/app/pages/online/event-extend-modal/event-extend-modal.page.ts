@@ -131,57 +131,7 @@ export class EventExtendModalPage implements AfterViewInit {
             .show(`Can't extend beyond next event start time`, '2000', 'bottom')
             .subscribe((_) => {});
         } else {
-          if (this.networkAvailable) {
-            let loader = this.loadingCtrl.create({
-              cssClass: 'custom-loader',
-              spinner: 'lines-small',
-            });
-            (await loader).present();
-
-            this.apiService
-              .updateEventTable('extend', this.roomName, this.roomID, [
-                {
-                  eventID: this.currentEventData?.event_id,
-                  eventName: this.currentEventData?.event_name,
-                  department: this.currentEventData?.dept_name,
-                  organizer: this.currentEventData?.organizer,
-                  startDateTime: this.currentEventData?.start_datetime,
-                  endDateTime: endDateTime + ':00',
-                  password: this.currentEventData?.dept_password,
-                },
-              ])
-              .then(
-                async (res: any) => {
-                  if (res?.status == 'success') {
-                    this.db
-                      .extendEventStatus(
-                        this.currentEventData?.id,
-                        endDateTime + ':00'
-                      )
-                      .then((res) => {
-                        this.toast
-                          .show(
-                            `Event extended for another ` +
-                              this.percent +
-                              ` minitues`,
-                            '3000',
-                            'bottom'
-                          )
-                          .subscribe((_) => {});
-                        this.modalCtrl.dismiss({ event: res });
-                      });
-                  }
-                  (await loader).dismiss();
-                },
-                async (err) => {
-                  (await loader).dismiss();
-                }
-              );
-          } else {
-            this.toast
-              .show(`No internet available`, '2000', 'bottom')
-              .subscribe((_) => {});
-          }
+          this.extendEvent(endDateTime);
         }
       } else {
         let currEndDateTime = formatDate(
@@ -202,58 +152,69 @@ export class EventExtendModalPage implements AfterViewInit {
           'MMM d, h:mm a',
           this.locale
         );
-        if (this.networkAvailable) {
-          let loader = this.loadingCtrl.create({
-            cssClass: 'custom-loader',
-            spinner: 'lines-small',
-          });
-          (await loader).present();
-
-          this.apiService
-            .updateEventTable('extend', this.roomName, this.roomID, [
-              {
-                eventID: this.currentEventData?.event_id,
-                eventName: this.currentEventData?.event_name,
-                department: this.currentEventData?.dept_name,
-                organizer: this.currentEventData?.organizer,
-                startDateTime: this.currentEventData?.start_datetime,
-                endDateTime: endDateTime + ':00',
-                password: this.currentEventData?.dept_password,
-              },
-            ])
-            .then(
-              async (res: any) => {
-                if (res?.status == 'success') {
-                  this.db
-                    .extendEventStatus(
-                      this.currentEventData?.id,
-                      endDateTime + ':00'
-                    )
-                    .then((res) => {
-                      this.toast
-                        .show(
-                          `Event extended for another ` +
-                            this.percent +
-                            ` minitues`,
-                          '3000',
-                          'bottom'
-                        )
-                        .subscribe((_) => {});
-                      this.modalCtrl.dismiss({ event: res });
-                    });
-                }
-                (await loader).dismiss();
-              },
-              async (err) => {
-                (await loader).dismiss();
-              }
-            );
-        } else {
-          this.toast
-            .show(`No internet available`, '2000', 'bottom')
-            .subscribe((_) => {});
-        }
+        this.extendEvent(endDateTime);
       }
+    }
+  }
+
+  async extendEvent(endDateTime) {
+    if (this.networkAvailable) {
+      let loader = this.loadingCtrl.create({
+        cssClass: 'custom-loader',
+        spinner: 'lines-small',
+      });
+      (await loader).present();
+
+      this.apiService
+        .updateEventTable('extend', this.roomName, this.roomID, [
+          {
+            eventID: this.currentEventData?.event_id,
+            eventName: this.currentEventData?.event_name,
+            department: this.currentEventData?.dept_name,
+            organizer: this.currentEventData?.organizer,
+            startDateTime: this.currentEventData?.start_datetime,
+            endDateTime: endDateTime + ':00',
+            password: this.currentEventData?.dept_password,
+          },
+        ])
+        .then(
+          async (res: any) => {
+            if (res?.status == 'success') {
+              this.db
+                .extendEventStatus(
+                  this.currentEventData?.id,
+                  endDateTime + ':00'
+                )
+                .then((res) => {
+                  this.toast
+                    .show(
+                      `Event extended for another ` +
+                        this.percent +
+                        ` minitues`,
+                      '3000',
+                      'bottom'
+                    )
+                    .subscribe((_) => {});
+                  this.modalCtrl.dismiss({ event: res });
+                });
+            } else if (res?.status == 'error' || res?.status == 'failure') {
+              this.toast
+                .show(` ` + res?.reason + ` `, '2000', 'bottom')
+                .subscribe((_) => {});
+            }
+            (await loader).dismiss();
+          },
+          async (err) => {
+            (await loader).dismiss();
+            this.toast
+              .show(`Server unreachable. Try again later.`, '2000', 'bottom')
+              .subscribe((_) => {});
+          }
+        );
+    } else {
+      this.toast
+        .show(`No internet available`, '2000', 'bottom')
+        .subscribe((_) => {});
     }
   }
 

@@ -6,6 +6,7 @@ export class Event {
   organizer: string;
   start_datetime: string;
   end_datetime: string;
+  aend_datetime: string;
   dept_password: string;
   event_status: number;
   sync_status: number;

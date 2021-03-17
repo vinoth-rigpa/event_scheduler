@@ -131,6 +131,12 @@ export class DashboardPendingPage implements OnInit {
                             'yyyy-MM-dd HH:mm',
                             this.locale
                           ) + ':00',
+                        aend_datetime:
+                          formatDate(
+                            res2.schedule[i].endDateTime,
+                            'yyyy-MM-dd HH:mm',
+                            this.locale
+                          ) + ':00',
                         dept_password: res2.schedule[i].password,
                         event_status: 0,
                         sync_status: 1,

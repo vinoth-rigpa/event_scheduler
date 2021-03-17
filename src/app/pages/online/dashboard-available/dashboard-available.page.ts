@@ -131,6 +131,12 @@ export class DashboardAvailablePage implements OnInit {
                             'yyyy-MM-dd HH:mm',
                             this.locale
                           ) + ':00',
+                        aend_datetime:
+                          formatDate(
+                            res2.schedule[i].endDateTime,
+                            'yyyy-MM-dd HH:mm',
+                            this.locale
+                          ) + ':00',
                         dept_password: res2.schedule[i].password,
                         event_status: 0,
                         sync_status: 1,
@@ -731,77 +737,10 @@ export class DashboardAvailablePage implements OnInit {
           });
           await modal.present();
           modal.onDidDismiss().then(async (result) => {
-            if (result.data && result.data.event) {
-              let event = result.data.event;
-
-              let eventInputArr = [];
-              event.start_datetime =
-                formatDate(
-                  event.start_datetime,
-                  'yyyy-MM-dd HH:mm',
-                  this.locale
-                ) + ':00';
-              event.end_datetime =
-                formatDate(
-                  event.end_datetime,
-                  'yyyy-MM-dd HH:mm',
-                  this.locale
-                ) + ':00';
-
-              let eventInputItem = {
-                eventID: event.event_id,
-                eventName: event.event_name,
-                department: event.dept_name,
-                organizer: event.organizer,
-                startDateTime: event.start_datetime,
-                endDateTime: event.end_datetime,
-                password: event.dept_password,
-              };
-
-              eventInputArr.push(eventInputItem);
-              AppConfig.consoleLog('eventInputArr', eventInputArr);
-
-              if (this.networkAvailable) {
-                let loader = this.loadingCtrl.create({
-                  cssClass: 'custom-loader',
-                  spinner: 'lines-small',
-                });
-                (await loader).present();
-
-                this.apiService
-                  .setEventTable(this.roomName, this.roomID, eventInputArr)
-                  .then(
-                    async (res: any) => {
-                      if (res?.status == 'success') {
-                        event.start_datetime =
-                          formatDate(
-                            event.start_datetime,
-                            'yyyy-MM-dd HH:mm',
-                            this.locale
-                          ) + ':00';
-                        event.end_datetime =
-                          formatDate(
-                            event.end_datetime,
-                            'yyyy-MM-dd HH:mm',
-                            this.locale
-                          ) + ':00';
-                        this.db.bookEvent(event).then((res) => {
-                          this.router.navigate([`online-dashboard`], {
-                            replaceUrl: true,
-                          });
-                        });
-                      }
-                      (await loader).dismiss();
-                    },
-                    async (err) => {
-                      (await loader).dismiss();
-                    }
-                  );
-              } else {
-                this.toast
-                  .show(`No internet available`, '2000', 'bottom')
-                  .subscribe((_) => {});
-              }
+            if (result.data && result.data.isAdded) {
+              this.router.navigate([`online-dashboard`], {
+                replaceUrl: true,
+              });
             }
           });
         } else {
@@ -827,85 +766,10 @@ export class DashboardAvailablePage implements OnInit {
         });
         await modal.present();
         modal.onDidDismiss().then(async (result) => {
-          if (result.data && result.data.event) {
-            let eventData = result.data.event;
-            let eventInputArr = [];
-            eventData.forEach((event, index, array) => {
-              event.start_datetime =
-                formatDate(
-                  event.start_datetime,
-                  'yyyy-MM-dd HH:mm',
-                  this.locale
-                ) + ':00';
-              event.end_datetime =
-                formatDate(
-                  event.end_datetime,
-                  'yyyy-MM-dd HH:mm',
-                  this.locale
-                ) + ':00';
-
-              let eventInputItem = {
-                eventID: event.event_id,
-                eventName: event.event_name,
-                department: event.dept_name,
-                organizer: event.organizer,
-                startDateTime: event.start_datetime,
-                endDateTime: event.end_datetime,
-                password: event.dept_password,
-              };
-
-              eventInputArr.push(eventInputItem);
+          if (result.data && result.data.isAdded) {
+            this.router.navigate([`online-dashboard`], {
+              replaceUrl: true,
             });
-
-            AppConfig.consoleLog('eventInputArr', eventInputArr);
-
-            if (this.networkAvailable) {
-              let loader = this.loadingCtrl.create({
-                cssClass: 'custom-loader',
-                spinner: 'lines-small',
-              });
-              (await loader).present();
-
-              this.apiService
-                .setEventTable(this.roomName, this.roomID, eventInputArr)
-                .then(
-                  async (res: any) => {
-                    if (res?.status == 'success') {
-                      eventData.forEach((event, index, array) => {
-                        event.start_datetime =
-                          formatDate(
-                            event.start_datetime,
-                            'yyyy-MM-dd HH:mm',
-                            this.locale
-                          ) + ':00';
-                        event.end_datetime =
-                          formatDate(
-                            event.end_datetime,
-                            'yyyy-MM-dd HH:mm',
-                            this.locale
-                          ) + ':00';
-                        this.db.addEvent(event).then((res) => {
-                          AppConfig.consoleLog('new event added');
-                        });
-                        if (index === array.length - 1) {
-                          AppConfig.consoleLog('add event - last index');
-                          this.router.navigate([`online-dashboard`], {
-                            replaceUrl: true,
-                          });
-                        }
-                      });
-                    }
-                    (await loader).dismiss();
-                  },
-                  async (err) => {
-                    (await loader).dismiss();
-                  }
-                );
-            } else {
-              this.toast
-                .show(`No internet available`, '2000', 'bottom')
-                .subscribe((_) => {});
-            }
           }
         });
       } else {

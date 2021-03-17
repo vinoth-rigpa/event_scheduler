@@ -85,6 +85,8 @@ export class SettingsPage implements OnInit {
                 async (res: any) => {
                   if (res?.status == 'success') {
                     this.db.changeRoomName(data.name).then((res) => {
+                      localStorage.setItem('room_name', data.name);
+                      this.roomName = localStorage.getItem('room_name');
                       this.toast
                         .show(
                           `Room Name updated successfully`,
@@ -93,11 +95,25 @@ export class SettingsPage implements OnInit {
                         )
                         .subscribe((_) => {});
                     });
+                  } else if (
+                    res?.status == 'error' ||
+                    res?.status == 'failure'
+                  ) {
+                    this.toast
+                      .show(` ` + res?.reason + ` `, '2000', 'bottom')
+                      .subscribe((_) => {});
                   }
                   (await loader).dismiss();
                 },
                 async (err) => {
                   (await loader).dismiss();
+                  this.toast
+                    .show(
+                      `Server unreachable. Try again later.`,
+                      '2000',
+                      'bottom'
+                    )
+                    .subscribe((_) => {});
                 }
               );
             } else {
