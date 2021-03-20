@@ -252,6 +252,13 @@ const routes: Routes = [
         (m) => m.SettingsPageModule
       ),
   },
+  {
+    path: 'change-logo-modal',
+    loadChildren: () =>
+      import('./pages/common/change-logo-modal/change-logo-modal.module').then(
+        (m) => m.ChangeLogoModalPageModule
+      ),
+  },
 ];
 
 @NgModule({

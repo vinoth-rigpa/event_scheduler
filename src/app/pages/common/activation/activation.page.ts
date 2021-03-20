@@ -134,7 +134,7 @@ export class ActivationPage implements OnInit {
         } else {
           if (
             this.device_otp == '12345678' ||
-            this.device_otp == this.encryptedCode
+            this.device_otp.toLowerCase() == this.encryptedCode.toLowerCase()
           ) {
             this.toast
               .show(AppConfig.ACTIVATION_SUCCESS_MSG, '2000', 'bottom')
@@ -151,7 +151,7 @@ export class ActivationPage implements OnInit {
       } else {
         if (
           this.device_otp == '12345678' ||
-          this.device_otp == this.encryptedCode
+          this.device_otp.toLowerCase() == this.encryptedCode.toLowerCase()
         ) {
           this.toast
             .show(AppConfig.ACTIVATION_SUCCESS_MSG, '2000', 'bottom')

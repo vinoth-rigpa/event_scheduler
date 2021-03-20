@@ -1,0 +1,33 @@
+<ion-toolbar color="primary">
+  <ion-title>Change Logo</ion-title>
+  <ion-buttons slot="end">
+    <ion-button (click)="close()">
+      <ion-icon name="close"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</ion-toolbar>
+<ion-content>
+  <div>
+    <ion-item class="recu-item">
+      <ion-label position="stacked" class="logo-lbl">Upload Logo</ion-label>
+      <ion-card>
+        <img [src]="newFileName" *ngIf="newFileName !=''" />
+        <ion-card-content>
+          <ion-button color="medium" size="large" (click)="imageUpload()">
+            <ion-icon slot="icon-only" name="cloud-upload"></ion-icon>
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+    </ion-item>
+  </div>
+  <div class="submit-btn-div">
+    <ion-button
+      color="primary"
+      class="ion-activatable ripple-parent submit-btn"
+      (click)="updateLogo()"
+      [disabled]="!(this.newFileName != '')"
+    >
+      Save <ion-ripple-effect></ion-ripple-effect>
+    </ion-button>
+  </div>
+</ion-content>

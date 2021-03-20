@@ -1,0 +1,29 @@
+ion-item {
+  margin: 10px 0;
+}
+
+.item-has-focus {
+  --highlight-background: none !important;
+}
+.submit-btn-div {
+  padding: 10px 0px;
+  width: 65%;
+  margin: 0 auto;
+  text-align: center;
+  color: #263674;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.item-interactive {
+  --border-width: 0;
+}
+.submit-btn {
+  font-size: 1rem;
+  color: #fff;
+}
+
+.logo-lbl {
+  margin-bottom: 10px !important;
+}

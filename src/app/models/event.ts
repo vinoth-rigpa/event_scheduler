@@ -8,6 +8,8 @@ export class Event {
   end_datetime: string;
   aend_datetime: string;
   dept_password: string;
+  event_type: number;
+  file_path: string;
   event_status: number;
   sync_status: number;
 }

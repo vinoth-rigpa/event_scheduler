@@ -249,6 +249,8 @@ export class DbService {
             end_datetime: res.rows.item(i).end_datetime,
             aend_datetime: res.rows.item(i).aend_datetime,
             dept_password: res.rows.item(i).dept_password,
+            event_type: res.rows.item(i).event_type,
+            file_path: res.rows.item(i).file_path,
             event_status: res.rows.item(i).event_status,
             sync_status: res.rows.item(i).sync_status,
           });
@@ -278,6 +280,8 @@ export class DbService {
               end_datetime: res.rows.item(i).end_datetime,
               aend_datetime: res.rows.item(i).aend_datetime,
               dept_password: res.rows.item(i).dept_password,
+              event_type: res.rows.item(i).event_type,
+              file_path: res.rows.item(i).file_path,
               event_status: res.rows.item(i).event_status,
               sync_status: res.rows.item(i).sync_status,
             });
@@ -307,6 +311,8 @@ export class DbService {
               end_datetime: res.rows.item(i).end_datetime,
               aend_datetime: res.rows.item(i).aend_datetime,
               dept_password: res.rows.item(i).dept_password,
+              event_type: res.rows.item(i).event_type,
+              file_path: res.rows.item(i).file_path,
               event_status: res.rows.item(i).event_status,
               sync_status: res.rows.item(i).sync_status,
             });
@@ -412,6 +418,8 @@ export class DbService {
           end_datetime: res.rows.item(0).end_datetime,
           aend_datetime: res.rows.item(0).aend_datetime,
           dept_password: res.rows.item(0).dept_password,
+          event_type: res.rows.item(0).event_type,
+          file_path: res.rows.item(0).file_path,
           event_status: res.rows.item(0).event_status,
           sync_status: res.rows.item(0).sync_status,
         };
@@ -469,6 +477,8 @@ export class DbService {
             end_datetime: res.rows.item(0).end_datetime,
             aend_datetime: res.rows.item(0).aend_datetime,
             dept_password: res.rows.item(0).dept_password,
+            event_type: res.rows.item(0).event_type,
+            file_path: res.rows.item(0).file_path,
             event_status: res.rows.item(0).event_status,
             sync_status: res.rows.item(0).sync_status,
           };
@@ -485,7 +495,7 @@ export class DbService {
   }
 
   releaseEventStatus(id, pmEndDate) {
-    pmEndDate = pmEndDate + ':00';
+    pmEndDate = formatDate(pmEndDate, 'yyyy-MM-dd HH:mm', this.locale) + ':00';
     let newDateObj = moment(new Date(pmEndDate)).subtract(1, 'm').toDate();
     let aendDateTime =
       formatDate(newDateObj, 'yyyy-MM-dd HH:mm', this.locale) + ':59';
@@ -500,7 +510,7 @@ export class DbService {
   }
 
   extendEventStatus(id, pmEndDate) {
-    pmEndDate = pmEndDate + ':00';
+    pmEndDate = formatDate(pmEndDate, 'yyyy-MM-dd HH:mm', this.locale) + ':00';
     let newDateObj = moment(new Date(pmEndDate)).subtract(1, 'm').toDate();
     let aendDateTime =
       formatDate(newDateObj, 'yyyy-MM-dd HH:mm', this.locale) + ':59';
@@ -539,6 +549,8 @@ export class DbService {
             aend_datetime: res.rows.item(0).aend_datetime,
             end_datetime: res.rows.item(0).end_datetime,
             dept_password: res.rows.item(0).dept_password,
+            event_type: res.rows.item(0).event_type,
+            file_path: res.rows.item(0).file_path,
             event_status: res.rows.item(0).event_status,
             sync_status: res.rows.item(0).sync_status,
           };
@@ -561,6 +573,8 @@ export class DbService {
             end_datetime: res.rows.item(0).end_datetime,
             aend_datetime: res.rows.item(0).aend_datetime,
             dept_password: res.rows.item(0).dept_password,
+            event_type: res.rows.item(0).event_type,
+            file_path: res.rows.item(0).file_path,
             event_status: res.rows.item(0).event_status,
             sync_status: res.rows.item(0).sync_status,
           };
@@ -598,6 +612,8 @@ export class DbService {
             end_datetime: res.rows.item(0).end_datetime,
             aend_datetime: res.rows.item(0).aend_datetime,
             dept_password: res.rows.item(0).dept_password,
+            event_type: res.rows.item(0).event_type,
+            file_path: res.rows.item(0).file_path,
             event_status: res.rows.item(0).event_status,
             sync_status: res.rows.item(0).sync_status,
           };
@@ -623,6 +639,8 @@ export class DbService {
             end_datetime: res.rows.item(0).end_datetime,
             aend_datetime: res.rows.item(0).aend_datetime,
             dept_password: res.rows.item(0).dept_password,
+            event_type: res.rows.item(0).event_type,
+            file_path: res.rows.item(0).file_path,
             event_status: res.rows.item(0).event_status,
             sync_status: res.rows.item(0).sync_status,
           };
@@ -650,6 +668,8 @@ export class DbService {
               end_datetime: res.rows.item(i).end_datetime,
               aend_datetime: res.rows.item(i).aend_datetime,
               dept_password: res.rows.item(i).dept_password,
+              event_type: res.rows.item(i).event_type,
+              file_path: res.rows.item(i).file_path,
               event_status: res.rows.item(i).event_status,
               sync_status: res.rows.item(i).sync_status,
             });

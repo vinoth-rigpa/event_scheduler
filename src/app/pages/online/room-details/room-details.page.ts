@@ -203,6 +203,8 @@ export class RoomDetailsPage implements OnInit {
                                           this.locale
                                         ) + ':00',
                                       dept_password: res2.schedule[i].password,
+                                      event_type: 0,
+                                      file_path: null,
                                       event_status: 0,
                                       sync_status: 1,
                                     };

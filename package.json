@@ -21,6 +21,7 @@
     "@angular/router": "~11.2.0",
     "@ionic-native/aes-256": "^5.31.1",
     "@ionic-native/barcode-scanner": "^5.31.1",
+    "@ionic-native/base64": "^5.31.1",
     "@ionic-native/browser-tab": "^5.31.1",
     "@ionic-native/camera": "^5.31.1",
     "@ionic-native/core": "^5.31.1",
@@ -32,6 +33,7 @@
     "@ionic-native/ionic-webview": "^5.31.1",
     "@ionic-native/native-page-transitions": "^5.31.1",
     "@ionic-native/network": "^5.31.1",
+    "@ionic-native/open-native-settings": "^5.31.1",
     "@ionic-native/splash-screen": "^5.31.1",
     "@ionic-native/sqlite": "^5.31.1",
     "@ionic-native/sqlite-porter": "^5.31.1",
@@ -60,7 +62,9 @@
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^12.11.1",
     "codelyzer": "^6.0.0",
+    "com-badrit-base64": "^0.2.0",
     "com.telerik.plugins.nativepagetransitions": "^0.7.0",
+    "cordova-open-native-settings": "^1.5.3",
     "cordova-plugin-advanced-http": "^3.1.0",
     "cordova-plugin-aes256-encryption": "^2.0.1",
     "cordova-plugin-browsertab": "^0.2.0",
@@ -115,7 +119,9 @@
       "cordova-plugin-filepath": {},
       "cordova-plugin-camera": {},
       "phonegap-plugin-barcodescanner": {},
-      "cordova-plugin-aes256-encryption": {}
+      "cordova-plugin-aes256-encryption": {},
+      "cordova-open-native-settings": {},
+      "com-badrit-base64": {}
     },
     "platforms": [
       "android"

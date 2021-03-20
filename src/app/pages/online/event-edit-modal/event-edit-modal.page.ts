@@ -6,12 +6,20 @@ import {
   FormControl,
 } from '@angular/forms';
 import { formatDate } from '@angular/common';
-import { ModalController, LoadingController, NavParams } from '@ionic/angular';
+import {
+  Platform,
+  ModalController,
+  LoadingController,
+  NavParams,
+} from '@ionic/angular';
 import { Toast } from '@ionic-native/toast/ngx';
 import { Department } from '../../../models/department';
 import { DbService } from '../../../services/db/db.service';
 import { AppConfig } from '../../../config/appconfig';
 import * as moment from 'moment';
+import { Subscription } from 'rxjs';
+import { Network } from '@ionic-native/network/ngx';
+import { ApiService } from '../../../services/api/api.service';
 
 @Component({
   selector: 'app-event-edit-modal',
@@ -22,6 +30,8 @@ export class EventEditModalPage implements AfterViewInit {
   currentPage: string = 'Online EventEditModalPage';
   device_uuid: any = '';
   device_password: any = '';
+  roomName: string = '';
+  roomID: string = '';
   modalReady = false;
   departmentData: Department[] = [];
   eventForm: FormGroup;
@@ -36,6 +46,12 @@ export class EventEditModalPage implements AfterViewInit {
     dept_password: [{ type: 'required', message: 'Password is required.' }],
   };
   minDate: any;
+  maxDate: any;
+  connectSubscription: Subscription = new Subscription();
+  disconnectSubscription: Subscription = new Subscription();
+  networkAvailable: boolean = false;
+  responseData: any;
+  isAdded = false;
 
   constructor(
     private db: DbService,
@@ -44,11 +60,17 @@ export class EventEditModalPage implements AfterViewInit {
     @Inject(LOCALE_ID) private locale: string,
     private toast: Toast,
     private navParams: NavParams,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    public platform: Platform,
+    private network: Network,
+    private apiService: ApiService
   ) {
     this.minDate = moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+    this.maxDate = moment().add(1, 'y').format('YYYY-MM-DDTHH:mm:ss.SSSZ');
     this.device_uuid = localStorage.getItem('device_uuid');
     this.device_password = localStorage.getItem('device_password');
+    this.roomID = localStorage.getItem('room_id');
+    this.roomName = localStorage.getItem('room_name');
   }
 
   ngOnInit() {
@@ -162,19 +184,13 @@ export class EventEditModalPage implements AfterViewInit {
                 (await loader).dismiss();
                 if (res) {
                   localStorage.setItem('popup_open', 'no');
-                  this.modalCtrl.dismiss({
-                    event_id: this.id,
-                    event: this.eventForm.value,
-                  });
+                  this.editEvent();
                 } else {
                   if (
                     this.eventForm.value.dept_password == this.device_password
                   ) {
                     localStorage.setItem('popup_open', 'no');
-                    this.modalCtrl.dismiss({
-                      event_id: this.id,
-                      event: this.eventForm.value,
-                    });
+                    this.editEvent();
                   } else {
                     this.toast
                       .show(AppConfig.INVALID_PASSWORD_MSG, '2000', 'bottom')
@@ -187,6 +203,95 @@ export class EventEditModalPage implements AfterViewInit {
     }
   }
 
+  async editEvent() {
+    let eventDataArr = [];
+    eventDataArr.push(this.eventForm.value);
+
+    if (eventDataArr.length > 0) {
+      let eventData = eventDataArr;
+      let eventInputArr = [];
+      eventData.forEach((event, index, array) => {
+        event.start_datetime =
+          formatDate(event.start_datetime, 'yyyy-MM-dd HH:mm', this.locale) +
+          ':00';
+        event.end_datetime =
+          formatDate(event.end_datetime, 'yyyy-MM-dd HH:mm', this.locale) +
+          ':00';
+
+        let eventInputItem = {
+          eventID: event.event_id,
+          eventName: event.event_name,
+          department: event.dept_name,
+          organizer: event.organizer,
+          startDateTime: event.start_datetime,
+          endDateTime: event.end_datetime,
+          password: event.dept_password,
+        };
+
+        eventInputArr.push(eventInputItem);
+      });
+
+      AppConfig.consoleLog('eventInputArr', eventInputArr);
+
+      if (this.networkAvailable) {
+        let loader = this.loadingCtrl.create({
+          cssClass: 'custom-loader',
+          spinner: 'lines-small',
+        });
+        (await loader).present();
+
+        this.apiService
+          .updateEventTable('edit', this.roomName, this.roomID, eventInputArr)
+          .then(
+            async (res: any) => {
+              if (res?.status == 'success') {
+                eventData.forEach((event, index, array) => {
+                  event.start_datetime =
+                    formatDate(
+                      event.start_datetime,
+                      'yyyy-MM-dd HH:mm',
+                      this.locale
+                    ) + ':00';
+                  event.end_datetime =
+                    formatDate(
+                      event.end_datetime,
+                      'yyyy-MM-dd HH:mm',
+                      this.locale
+                    ) + ':00';
+                  this.db.updateEvent(this.id, event).then((res) => {
+                    this.toast
+                      .show(`Event details updated`, '2000', 'bottom')
+                      .subscribe((_) => {});
+                  });
+
+                  if (index === array.length - 1) {
+                    AppConfig.consoleLog('add event - last index');
+                    this.isAdded = true;
+                    this.modalCtrl.dismiss({ isAdded: this.isAdded });
+                  }
+                });
+              } else if (res?.status == 'error' || res?.status == 'failure') {
+                this.toast
+                  .show(` ` + res?.reason + ` `, '2000', 'bottom')
+                  .subscribe((_) => {});
+              }
+              (await loader).dismiss();
+            },
+            async (err) => {
+              (await loader).dismiss();
+              this.toast
+                .show(`Server unreachable. Try again later.`, '2000', 'bottom')
+                .subscribe((_) => {});
+            }
+          );
+      } else {
+        this.toast
+          .show(`No internet available`, '2000', 'bottom')
+          .subscribe((_) => {});
+      }
+    }
+  }
+
   openPopupWindow() {
     localStorage.setItem('popup_open', 'yes');
   }
@@ -194,5 +299,35 @@ export class EventEditModalPage implements AfterViewInit {
   close() {
     localStorage.setItem('popup_open', 'no');
     this.modalCtrl.dismiss();
+  }
+
+  isConnected(): boolean {
+    let conntype = this.network.type;
+    return conntype && conntype !== 'unknown' && conntype !== 'none';
+  }
+
+  networkSubscribe() {
+    this.network.onDisconnect().subscribe(() => {
+      this.networkAvailable = false;
+    });
+    this.network.onConnect().subscribe(() => {
+      this.networkAvailable = true;
+    });
+  }
+
+  networkUnsubscribe() {
+    this.connectSubscription.unsubscribe();
+    this.disconnectSubscription.unsubscribe();
+  }
+
+  ionViewDidEnter() {
+    if (this.isConnected()) {
+      this.networkAvailable = true;
+      AppConfig.consoleLog('Network available');
+    } else {
+      this.networkAvailable = false;
+      AppConfig.consoleLog('Network unavailable');
+    }
+    this.networkSubscribe();
   }
 }

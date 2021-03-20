@@ -51,3 +51,73 @@ h4 {
   align-items: center;
   justify-content: center;
 }
+
+
+.green_add {
+  background-image: url(/assets/icon/green_add.png);
+}
+.green_calendar {
+  background-image: url(/assets/icon/green_calendar.png);
+}
+.green_delete {
+  background-image: url(/assets/icon/green_delete.png);
+}
+.green_extend {
+  background-image: url(/assets/icon/green_extend.png);
+}
+.green_release {
+  background-image: url(/assets/icon/green_release.png);
+}
+.green_spotbook {
+  background-image: url(/assets/icon/green_spotbook.png);
+}
+.orange_add {
+  background-image: url(/assets/icon/orange_add.png);
+}
+.orange_calendar {
+  background-image: url(/assets/icon/orange_calendar.png);
+}
+.orange_delete {
+  background-image: url(/assets/icon/orange_delete.png);
+}
+.orange_extend {
+  background-image: url(/assets/icon/orange_extend.png);
+}
+.orange_release {
+  background-image: url(/assets/icon/orange_release.png);
+}
+.orange_spotbook {
+  background-image: url(/assets/icon/orange_spotbook.png);
+}
+.red_add {
+  background-image: url(/assets/icon/red_add.png);
+}
+.red_calendar {
+  background-image: url(/assets/icon/red_calendar.png);
+}
+.red_delete {
+  background-image: url(/assets/icon/red_delete.png);
+}
+.red_extend {
+  background-image: url(/assets/icon/red_extend.png);
+}
+.red_release {
+  background-image: url(/assets/icon/red_release.png);
+}
+.red_spotbook {
+  background-image: url(/assets/icon/red_spotbook.png);
+}
+.grey_extend {
+  background-image: url(/assets/icon/grey_extend.png);
+}
+.grey_release {
+  background-image: url(/assets/icon/grey_release.png);
+}
+.grey_spotbook {
+  background-image: url(/assets/icon/grey_spotbook.png);
+}
+#available_ul,#occupied_ul,#pending_ul{
+  visibility: hidden;
+  width: 0;
+  height: 0;
+}

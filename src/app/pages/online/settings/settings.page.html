@@ -4,6 +4,11 @@
       <ion-icon name="arrow-back-outline" class="back-icon-btn"></ion-icon>
     </ion-buttons>
     <ion-title>Settings</ion-title>
+    <!-- <ion-buttons slot="end" (click)="openSettingsMenu()">
+      <ion-button>
+        <ion-icon name="settings-outline" class="add-icon-btn"></ion-icon>
+      </ion-button>
+    </ion-buttons> -->
   </ion-toolbar>
 </ion-header>
 <ion-content>
@@ -24,6 +29,11 @@
       </ion-label>
     </ion-item>
     <ion-item>
+      <ion-label color="primary" (click)="changeLogo()">
+        <h6>Change Logo</h6>
+      </ion-label>
+    </ion-item>
+    <ion-item>
       <ion-label color="primary">Page Timeout Duration</ion-label>
       <ion-select
         (click)="openPopupWindow()"
@@ -37,6 +47,11 @@
         <ion-select-option value="45000">45 seconds</ion-select-option>
         <ion-select-option value="60000">60 seconds</ion-select-option>
       </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label color="primary" (click)="openSettingsMenu()">
+        <h6>Device Settings</h6>
+      </ion-label>
     </ion-item>
   </ion-list>
 </ion-content>

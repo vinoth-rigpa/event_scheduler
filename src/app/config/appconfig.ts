@@ -14,6 +14,7 @@ export class AppConfig {
   public static RESET_PASSWORD_SUCCESS_MSG = 'Password reset successfully';
   public static INVALID_PASSWORD_MSG = 'Invalid password';
   public static IMAGE_STORAGE_KEY = 'event_image';
+  public static LOGO_STORAGE_KEY = 'company_logo';
   public static consoleLog(pmMsg = '', pmObj = null) {
     console.log(
       new Date().getHours() +

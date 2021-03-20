@@ -181,10 +181,7 @@ export class EventExtendModalPage implements AfterViewInit {
           async (res: any) => {
             if (res?.status == 'success') {
               this.db
-                .extendEventStatus(
-                  this.currentEventData?.id,
-                  endDateTime + ':00'
-                )
+                .extendEventStatus(this.currentEventData?.id, endDateTime)
                 .then((res) => {
                   this.toast
                     .show(

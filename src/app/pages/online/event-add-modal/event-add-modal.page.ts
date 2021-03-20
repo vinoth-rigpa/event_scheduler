@@ -123,10 +123,13 @@ export class EventAddModalPage implements AfterViewInit {
     this.storage.get(AppConfig.IMAGE_STORAGE_KEY).then((images) => {
       if (images) {
         let arr = JSON.parse(images);
+        AppConfig.consoleLog('arr', arr);
         this.images = [];
         for (let img of arr) {
           let filePath = this.file.dataDirectory + img;
+          AppConfig.consoleLog('filePath', filePath);
           let resPath = this.pathForImage(filePath);
+          AppConfig.consoleLog('resPath', resPath);
           this.images.push({ name: img, path: resPath, filePath: filePath });
         }
       }
@@ -165,6 +168,10 @@ export class EventAddModalPage implements AfterViewInit {
             imagePath.lastIndexOf('/') + 1,
             imagePath.lastIndexOf('?')
           );
+
+          AppConfig.consoleLog('correctPath', correctPath);
+          AppConfig.consoleLog('currentName', currentName);
+          AppConfig.consoleLog('createFileName', this.createFileName());
           this.copyFileToLocalDir(
             correctPath,
             currentName,
@@ -208,6 +215,7 @@ export class EventAddModalPage implements AfterViewInit {
   updateStoredImages(name) {
     this.storage.get(AppConfig.IMAGE_STORAGE_KEY).then((images) => {
       let arr = JSON.parse(images);
+      AppConfig.consoleLog('arr', arr);
       if (!arr) {
         let newImages = [name];
         this.storage.set(

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppConfig } from '../../../config/appconfig';
+
 @Component({
   selector: 'app-splash',
   templateUrl: './splash.page.html',

@@ -32,6 +32,8 @@ CREATE TABLE IF NOT EXISTS events(
     end_datetime TEXT NOT NULL,
     aend_datetime TEXT NOT NULL,
     dept_password TEXT NOT NULL,
+    event_type INTEGER DEFAULT 0,
+    file_path TEXT DEFAULT NULL,
     event_status INTEGER DEFAULT 0,
     sync_status INTEGER DEFAULT 0
 );

@@ -1,5 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Platform, AlertController, LoadingController } from '@ionic/angular';
+import {
+  Platform,
+  AlertController,
+  ModalController,
+  LoadingController,
+} from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Toast } from '@ionic-native/toast/ngx';
 import { AppConfig } from '../../../config/appconfig';
@@ -7,6 +12,8 @@ import { DbService } from '../../../services/db/db.service';
 import { Subscription } from 'rxjs';
 import { Network } from '@ionic-native/network/ngx';
 import { ApiService } from '../../../services/api/api.service';
+import { OpenNativeSettings } from '@ionic-native/open-native-settings/ngx';
+import { ChangeLogoModalPage } from '../../common/change-logo-modal/change-logo-modal.page';
 
 @Component({
   selector: 'app-settings',
@@ -27,11 +34,13 @@ export class SettingsPage implements OnInit {
   constructor(
     public alertCtrl: AlertController,
     public loadingCtrl: LoadingController,
+    private modalCtrl: ModalController,
     public platform: Platform,
     private apiService: ApiService,
     private db: DbService,
     private network: Network,
     private router: Router,
+    private openNativeSettings: OpenNativeSettings,
     private toast: Toast
   ) {
     this.device_uuid = localStorage.getItem('device_uuid');
@@ -50,6 +59,34 @@ export class SettingsPage implements OnInit {
 
   goPage(pmPage) {
     this.router.navigate([`online-` + pmPage], { replaceUrl: true });
+  }
+
+  openSettingsMenu() {
+    if (this.openNativeSettings) {
+      console.log('openNativeSettingsTest is active');
+      this.openNativeSettings.open('settings').then(
+        (val) => {
+          console.log('success');
+        },
+        (err) => {
+          console.log('error', err);
+        }
+      );
+    } else {
+      console.log('this.openNativeSettings is not active!');
+    }
+  }
+
+  async changeLogo() {
+    const modal = await this.modalCtrl.create({
+      component: ChangeLogoModalPage,
+      cssClass: 'event-view-modal',
+      backdropDismiss: false,
+    });
+    await modal.present();
+    modal.onDidDismiss().then((result) => {
+      AppConfig.consoleLog('current Event extended');
+    });
   }
 
   async changeRoomName() {

@@ -1,4 +1,11 @@
-import { Component, OnInit, Inject, LOCALE_ID, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Inject,
+  LOCALE_ID,
+  ViewChild,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
 import { AppConfig } from '../../../config/appconfig';
@@ -16,6 +23,7 @@ import { EventListModalPage } from '../event-list-modal/event-list-modal.page';
 import { EventBookModalPage } from '../event-book-modal/event-book-modal.page';
 import { EventExtendModalPage } from '../event-extend-modal/event-extend-modal.page';
 import * as moment from 'moment';
+import { Storage } from '@ionic/storage';
 
 @Component({
   selector: 'app-dashboard-occupied',
@@ -39,6 +47,8 @@ export class DashboardOccupiedPage implements OnInit {
   intervalRefreshData: any;
   sliderTitle: any = '';
   @ViewChild('slides', { static: true }) slides: IonSlides;
+  logoImg: any = '/assets/imgs/logo_transparent.png';
+
   constructor(
     public alertController: AlertController,
     private modalCtrl: ModalController,
@@ -46,13 +56,43 @@ export class DashboardOccupiedPage implements OnInit {
     @Inject(LOCALE_ID) private locale: string,
     private db: DbService,
     private router: Router,
-    private toast: Toast
+    private toast: Toast,
+    private storage: Storage,
+    private ref: ChangeDetectorRef
   ) {
     this.device_uuid = localStorage.getItem('device_uuid');
     this.device_password = localStorage.getItem('device_password');
     this.startTime();
+    this.getLogo();
     this.todayDate = formatDate(new Date(), 'MMM d, yyyy', this.locale);
     this.todayDateTxt = formatDate(new Date(), 'MMM d', this.locale);
+  }
+
+  getLogo() {
+    this.storage.get(AppConfig.LOGO_STORAGE_KEY).then((image) => {
+      AppConfig.consoleLog('LOGO_STORAGE_KEY', image);
+      if (image != '') {
+        this.logoImg = image;
+        let header_logo = document.getElementsByClassName('header-logo-holder');
+        for (let i = 0; i < header_logo.length; ++i) {
+          let item = header_logo[i];
+          item.setAttribute(
+            'style',
+            "background-image:url('" + this.logoImg + "');"
+          );
+        }
+      } else {
+        let header_logo = document.getElementsByClassName('header-logo-holder');
+        for (let i = 0; i < header_logo.length; ++i) {
+          let item = header_logo[i];
+          item.setAttribute(
+            'style',
+            "background-image:url('" + this.logoImg + "');"
+          );
+        }
+      }
+      this.ref.detectChanges();
+    });
   }
 
   ngOnInit() {

@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
 import { AppConfig } from '../../../config/appconfig';
 import { Toast } from '@ionic-native/toast/ngx';
 import { DbService } from '../../../services/db/db.service';
+import { OpenNativeSettings } from '@ionic-native/open-native-settings/ngx';
+import { ChangeLogoModalPage } from '../../common/change-logo-modal/change-logo-modal.page';
 
 @Component({
   selector: 'app-settings',
@@ -19,8 +21,10 @@ export class SettingsPage implements OnInit {
 
   constructor(
     public alertController: AlertController,
+    private modalCtrl: ModalController,
     private router: Router,
     private db: DbService,
+    private openNativeSettings: OpenNativeSettings,
     private toast: Toast
   ) {
     this.device_uuid = localStorage.getItem('device_uuid');
@@ -45,6 +49,34 @@ export class SettingsPage implements OnInit {
 
   goPage(pmPage) {
     this.router.navigate([`offline-` + pmPage], { replaceUrl: true });
+  }
+
+  openSettingsMenu() {
+    if (this.openNativeSettings) {
+      console.log('openNativeSettingsTest is active');
+      this.openNativeSettings.open('settings').then(
+        (val) => {
+          console.log('success');
+        },
+        (err) => {
+          console.log('error', err);
+        }
+      );
+    } else {
+      console.log('this.openNativeSettings is not active!');
+    }
+  }
+
+  async changeLogo() {
+    const modal = await this.modalCtrl.create({
+      component: ChangeLogoModalPage,
+      cssClass: 'event-view-modal',
+      backdropDismiss: false,
+    });
+    await modal.present();
+    modal.onDidDismiss().then((result) => {
+      AppConfig.consoleLog('current Event extended');
+    });
   }
 
   async changeRoomName() {

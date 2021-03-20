@@ -1,4 +1,11 @@
-import { Component, OnInit, Inject, LOCALE_ID, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Inject,
+  LOCALE_ID,
+  ViewChild,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
 import { AppConfig } from '../../../config/appconfig';
@@ -20,6 +27,7 @@ import * as moment from 'moment';
 import { Subscription } from 'rxjs';
 import { Network } from '@ionic-native/network/ngx';
 import { ApiService } from '../../../services/api/api.service';
+import { Storage } from '@ionic/storage';
 
 @Component({
   selector: 'app-dashboard-available',
@@ -48,6 +56,7 @@ export class DashboardAvailablePage implements OnInit {
   disconnectSubscription: Subscription = new Subscription();
   networkAvailable: boolean = false;
   responseData: any;
+  logoImg: any = '/assets/imgs/logo_transparent.png';
 
   constructor(
     public alertController: AlertController,
@@ -59,6 +68,8 @@ export class DashboardAvailablePage implements OnInit {
     private toast: Toast,
     public platform: Platform,
     private network: Network,
+    private storage: Storage,
+    private ref: ChangeDetectorRef,
     private apiService: ApiService
   ) {
     this.device_uuid = localStorage.getItem('device_uuid');
@@ -66,8 +77,36 @@ export class DashboardAvailablePage implements OnInit {
     this.roomID = localStorage.getItem('room_id');
     this.roomName = localStorage.getItem('room_name');
     this.startTime();
+    this.getLogo();
     this.todayDate = formatDate(new Date(), 'MMM d, yyyy', this.locale);
     this.todayDateTxt = formatDate(new Date(), 'MMM d', this.locale);
+  }
+
+  getLogo() {
+    this.storage.get(AppConfig.LOGO_STORAGE_KEY).then((image) => {
+      AppConfig.consoleLog('LOGO_STORAGE_KEY', image);
+      if (image != '') {
+        this.logoImg = image;
+        let header_logo = document.getElementsByClassName('header-logo-holder');
+        for (let i = 0; i < header_logo.length; ++i) {
+          let item = header_logo[i];
+          item.setAttribute(
+            'style',
+            "background-image:url('" + this.logoImg + "');"
+          );
+        }
+      } else {
+        let header_logo = document.getElementsByClassName('header-logo-holder');
+        for (let i = 0; i < header_logo.length; ++i) {
+          let item = header_logo[i];
+          item.setAttribute(
+            'style',
+            "background-image:url('" + this.logoImg + "');"
+          );
+        }
+      }
+      this.ref.detectChanges();
+    });
   }
 
   ngOnInit() {
@@ -138,6 +177,8 @@ export class DashboardAvailablePage implements OnInit {
                             this.locale
                           ) + ':00',
                         dept_password: res2.schedule[i].password,
+                        event_type: 0,
+                        file_path: null,
                         event_status: 0,
                         sync_status: 1,
                       };
@@ -597,42 +638,10 @@ export class DashboardAvailablePage implements OnInit {
                 .then(async (res) => {
                   (await loader).dismiss();
                   if (res) {
-                    let currentDateTime = formatDate(
-                      new Date(),
-                      'yyyy-MM-dd HH:mm',
-                      this.locale
-                    );
-                    this.db
-                      .releaseEventStatus(
-                        this.currentEventData?.id,
-                        currentDateTime
-                      )
-                      .then((res) => {
-                        AppConfig.consoleLog('current Event released');
-                        this.toast
-                          .show(`Event released`, '2000', 'bottom')
-                          .subscribe((_) => {});
-                        this.refreshData();
-                      });
+                    this.releaseEventAction();
                   } else {
                     if (data.password == this.device_password) {
-                      let currentDateTime = formatDate(
-                        new Date(),
-                        'yyyy-MM-dd HH:mm',
-                        this.locale
-                      );
-                      this.db
-                        .releaseEventStatus(
-                          this.currentEventData?.id,
-                          currentDateTime
-                        )
-                        .then((res) => {
-                          AppConfig.consoleLog('current Event released');
-                          this.toast
-                            .show(`Event released`, '2000', 'bottom')
-                            .subscribe((_) => {});
-                          this.refreshData();
-                        });
+                      this.releaseEventAction();
                     } else {
                       this.toast
                         .show(AppConfig.INVALID_PASSWORD_MSG, '2000', 'bottom')
@@ -645,6 +654,71 @@ export class DashboardAvailablePage implements OnInit {
         ],
       });
       await alert.present();
+    }
+  }
+
+  async releaseEventAction() {
+    let currentDateTime = formatDate(
+      new Date(),
+      'yyyy-MM-dd HH:mm',
+      this.locale
+    );
+    if (this.networkAvailable) {
+      let loader = this.loadingCtrl.create({
+        cssClass: 'custom-loader',
+        spinner: 'lines-small',
+      });
+      (await loader).present();
+
+      this.apiService
+        .updateEventTable('release', this.roomName, this.roomID, [
+          {
+            eventID: this.currentEventData?.event_id,
+            eventName: this.currentEventData?.event_name,
+            department: this.currentEventData?.dept_name,
+            organizer: this.currentEventData?.organizer,
+            startDateTime:
+              formatDate(
+                new Date().getFullYear() +
+                  ' ' +
+                  this.currentEventData?.start_datetime,
+                'yyyy-MM-dd HH:mm',
+                this.locale
+              ) + ':00',
+            endDateTime: currentDateTime + ':00',
+            password: this.currentEventData?.dept_password,
+          },
+        ])
+        .then(
+          async (res: any) => {
+            if (res?.status == 'success') {
+              this.db
+                .releaseEventStatus(this.currentEventData?.id, currentDateTime)
+                .then((res) => {
+                  AppConfig.consoleLog('current Event released');
+                  this.toast
+                    .show(`Event released`, '2000', 'bottom')
+                    .subscribe((_) => {});
+                  this.refreshData();
+                });
+            } else if (res?.status == 'error' || res?.status == 'failure') {
+              this.toast
+                .show(` ` + res?.reason + ` `, '2000', 'bottom')
+                .subscribe((_) => {});
+            }
+            (await loader).dismiss();
+          },
+          async (err) => {
+            (await loader).dismiss();
+            this.toast
+              .show(`Server unreachable. Try again later.`, '2000', 'bottom')
+              .subscribe((_) => {});
+          }
+        );
+    } else {
+      this.toast
+        .show(`No internet available`, '2000', 'bottom')
+        .subscribe((_) => {});
     }
   }
 

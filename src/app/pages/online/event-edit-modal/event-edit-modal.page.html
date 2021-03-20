@@ -46,6 +46,7 @@
       <ion-datetime
         (click)="openPopupWindow()"
         [min]="minDate"
+        [max]="maxDate"
         displayFormat="D MMM YYYY H:mm"
         formControlName="start_datetime"
         (ionChange)="checkEventTime($event)"
@@ -68,6 +69,7 @@
       <ion-datetime
         (click)="openPopupWindow()"
         [min]="minDate"
+        [max]="maxDate"
         displayFormat="D MMM YYYY H:mm"
         formControlName="end_datetime"
         (ionChange)="checkEventTime($event)"

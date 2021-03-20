@@ -24,6 +24,8 @@ import { FilePath } from '@ionic-native/file-path/ngx';
 import { Camera } from '@ionic-native/Camera/ngx';
 import { QRCodeModule } from 'angularx-qrcode';
 import { AES256 } from '@ionic-native/aes-256/ngx';
+import { OpenNativeSettings } from '@ionic-native/open-native-settings/ngx';
+import { Base64 } from '@ionic-native/base64/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -60,6 +62,8 @@ import { AES256 } from '@ionic-native/aes-256/ngx';
     FilePath,
     Camera,
     AES256,
+    Base64,
+    OpenNativeSettings,
     NativePageTransitions,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],

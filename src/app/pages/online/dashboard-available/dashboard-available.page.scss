@@ -76,15 +76,14 @@
 }
 .header-logo-holder {
   position: absolute;
-  left: 0;
+  left: 20px;
   margin: 0;
   display: flex;
   width: 250px;
   height: 60px;
-  background-image: url(/assets/imgs/logo_transparent.png);
   background-size: contain;
   background-repeat: no-repeat;
-  background-position: center;
+  background-position: left;
 }
 .time-menu-holder {
   display: flex;
