@@ -103,6 +103,20 @@ ion-app {
   padding: 0 5vw;
 }
 
+.change-logo-modal {
+  --height: 80%;
+  --border-radius: 10px;
+  --backdrop-opacity: 1 !important;
+  --background: #fff !important;
+  width: 100%;
+  padding: 10vw;
+  padding: 0 5vw;
+  .modal-wrapper {
+    width: 75vw !important;
+    height: 75vh !important;
+  }
+}
+
 .event-list-modal {
   --height: 80%;
   --border-radius: 10px;

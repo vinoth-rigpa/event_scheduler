@@ -85,7 +85,7 @@ export class DashboardOccupiedPage implements OnInit {
   getLogo() {
     this.storage.get(AppConfig.LOGO_STORAGE_KEY).then((image) => {
       AppConfig.consoleLog('LOGO_STORAGE_KEY', image);
-      if (image != '') {
+      if (image) {
         this.logoImg = image;
         let header_logo = document.getElementsByClassName('header-logo-holder');
         for (let i = 0; i < header_logo.length; ++i) {

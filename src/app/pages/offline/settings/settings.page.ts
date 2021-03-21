@@ -70,7 +70,7 @@ export class SettingsPage implements OnInit {
   async changeLogo() {
     const modal = await this.modalCtrl.create({
       component: ChangeLogoModalPage,
-      cssClass: 'event-view-modal',
+      cssClass: 'change-logo-modal',
       backdropDismiss: false,
     });
     await modal.present();

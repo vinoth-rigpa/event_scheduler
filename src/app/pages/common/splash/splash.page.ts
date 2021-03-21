@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { AppConfig } from '../../../config/appconfig';
 
 @Component({
@@ -9,10 +10,29 @@ import { AppConfig } from '../../../config/appconfig';
 })
 export class SplashPage implements OnInit {
   currentPage: string = 'SplashPage';
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private androidPermissions: AndroidPermissions
+  ) {}
 
   ngOnInit() {
     AppConfig.consoleLog(this.currentPage + ' OnInit');
+    this.androidPermissions
+      .checkPermission(this.androidPermissions.PERMISSION.READ_EXTERNAL_STORAGE)
+      .then(
+        (result) => {
+          console.log('Has permission?', result.hasPermission);
+          if (!result.hasPermission) {
+            this.androidPermissions.requestPermission(
+              this.androidPermissions.PERMISSION.READ_EXTERNAL_STORAGE
+            );
+          }
+        },
+        (err) =>
+          this.androidPermissions.requestPermission(
+            this.androidPermissions.PERMISSION.READ_EXTERNAL_STORAGE
+          )
+      );
   }
 
   ionViewDidEnter() {
